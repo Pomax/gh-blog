@@ -1,6 +1,6 @@
-var React = require("react");
+import React from "../lib/vendor/react/react.0.12.min.js";
 
-module.exports = React.createClass({
+export default React.createClass({
 
   getInitialState: function() {
     return { text: '' };

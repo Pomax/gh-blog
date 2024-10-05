@@ -1,4 +1,4 @@
-module.exports = {
+export default {
   /**
    * So, this is weird given that
    */

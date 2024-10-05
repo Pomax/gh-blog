@@ -1,17 +1,15 @@
-var React = require("react");
-var utils = require("../lib/utils");
+import React from "../lib/vendor/react/react.0.12.min.js";
+import utils from "../lib/utils.js";
+import Admin from "./Admin.jsx";
+import Entry from "./Entry.jsx";
 
-var Admin = require("./Admin.jsx");
-var Entry = require("./Entry.jsx");
+import connector from "../mixins/connector";
+import timeToId from "../mixins/timetoid";
+import rssGenerator from "../mixins/rssgenerator";
+import webLogSettings from "../mixins/weblogsettings";
 
-module.exports = React.createClass({
-
-  mixins: [
-    require("../mixins/connector"),
-    require("../mixins/timetoid"),
-    require("../mixins/rssgenerator"),
-    require("../mixins/weblogsettings")
-  ],
+export default React.createClass({
+  mixins: [connector, timeToId, rssGenerator, webLogSettings],
 
   // local cache, because we don't want to load the entire
   // index at once, and we don't want to requery for it.
@@ -21,35 +19,43 @@ module.exports = React.createClass({
   // be modified multiple times per time slice.
   list: {},
 
-  getInitialState: function() {
+  getInitialState() {
     return {
       singleton: false,
       entries: this.list,
       slice: { start: 0, end: 10 },
-      githubissues: '',
+      githubissues: "",
       authenticated: false,
-      site: '',
-      issues: ''
+      site: "",
+      issues: "",
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     // are we authenticataed?
     var settings = this.getSettings();
-    if(settings) {
+    if (settings) {
       this.connector = new this.Connector(settings);
-      if(settings.token) { this.setState({ authenticated: true }); }
-    } else { this.connector = new this.Connector(); }
+      if (settings.token) {
+        this.setState({ authenticated: true });
+      }
+    } else {
+      this.connector = new this.Connector();
+    }
 
     // are we loading one entry, or "all" entries?
-    var fragmentId = window.location.hash || false;
-    if(fragmentId) {
-      if(fragmentId.indexOf("#gh-weblog")>-1) {
-        fragmentId = fragmentId.replace("#gh-weblog-",'');
-      } else { fragmentId = false; }
+    var fragmentId = location.hash || false;
+    if (fragmentId) {
+      if (fragmentId.indexOf("#gh-weblog") > -1) {
+        fragmentId = fragmentId.replace("#gh-weblog-", "");
+      } else {
+        fragmentId = false;
+      }
     }
     var id = this.timeToId(fragmentId);
-    if(id) { this.setState({ singleton: true }); }
+    if (id) {
+      this.setState({ singleton: true });
+    }
 
     // load the necessary index information
     this.connector.loadIndex(this.loadIndex, id);
@@ -57,36 +63,59 @@ module.exports = React.createClass({
     // determine the issue tracker to use:
     var a = document.createElement("a");
     a.href = this.props.base;
-    var user = a.host.replace(".github.io",'');
-    var path = a.pathname.replace(/^\//,'').trim().split('/')[0];
+    var user = a.host.replace(".github.io", "");
+    var path = a.pathname.replace(/^\//, "").trim().split("/")[0];
     var repo = path ? path : a.host;
     this.setState({
       site: "http://github.com/" + user + "/" + repo,
-      issues: "http://github.com/" + user + "/" + repo + "/issues"
+      issues: "http://github.com/" + user + "/" + repo + "/issues",
     });
   },
 
-  render: function() {
-    if(!!this.state.singleton) { return this.renderContent(); }
-    var postbutton = this.state.authenticated ? <button className="admin post button" onClick={this.create}>new entry</button> : false;
-    var adminbutton = <button className="authenticate" onClick={this.showSettings} onClose={this.bindSettings}>admin</button>
+  render() {
+    if (!!this.state.singleton) {
+      return this.renderContent();
+    }
+    var postbutton = this.state.authenticated ? (
+      <button className="admin post button" onClick={this.create}>
+        new entry
+      </button>
+    ) : (
+      false
+    );
+    var adminbutton = (
+      <button
+        className="authenticate"
+        onClick={this.showSettings}
+        onClose={this.bindSettings}
+      >
+        admin
+      </button>
+    );
     var morebutton = <button onClick={this.more}>Load more posts</button>;
-    return this.renderContent(adminbutton, postbutton, morebutton)
+    return this.renderContent(adminbutton, postbutton, morebutton);
   },
 
-  renderContent: function(adminbutton, postbutton, morebutton) {
+  renderContent(adminbutton, postbutton, morebutton) {
     // ensure the URL looks "normal"
     var entry = false;
     if (arguments.length === 0) {
       entry = this.getSlice()[0];
-      if(!entry) { return false; }
+      if (!entry) {
+        return false;
+      }
       var title = utils.titleReplace(entry.metadata.title);
-      var vanityURL = ["/", entry.metadata.created, "/", title].join('');
-      window.history.replaceState({}, title, vanityURL);
+      var vanityURL = ["/", entry.metadata.created, "/", title].join("");
+      history.replaceState({}, title, vanityURL);
     }
     return (
       <div ref="weblog" className="gh-weblog">
-        <Admin ref="admin" hidden="true" onClose={this.bindSettings} onLogout={this.onLogOut}/>
+        <Admin
+          ref="admin"
+          hidden="true"
+          onClose={this.bindSettings}
+          onLogout={this.onLogOut}
+        />
         {adminbutton}
         {postbutton}
         {this.generateEntries(entry ? [entry] : false)}
@@ -95,69 +124,78 @@ module.exports = React.createClass({
     );
   },
 
-  generateEntries: function(entries) {
+  generateEntries(entries) {
     entries = entries || this.getSlice();
     var self = this;
-    return entries.map(function(entry) {
-      return <Entry key={entry.metadata.created}
-                    ref={entry.metadata.id}
-                    issues={self.state.issues}
-                    metadata={entry.metadata}
-                    postdata={entry.postdata}
-                    editable={!self.state.singleton && self.state.authenticated}
-                    runProcessors={self.runProcessors}
-                    onSave={self.save}
-                    onDelete={self.delete}/>;
+    return entries.map(function (entry) {
+      return (
+        <Entry
+          key={entry.metadata.created}
+          ref={entry.metadata.id}
+          issues={self.state.issues}
+          metadata={entry.metadata}
+          postdata={entry.postdata}
+          editable={!self.state.singleton && self.state.authenticated}
+          runProcessors={self.runProcessors}
+          onSave={self.save}
+          onDelete={self.delete}
+        />
+      );
     });
   },
 
-  runProcessors: function(domnode) {
-    if(this.props.processors && this.props.processors instanceof Array) {
-      this.props.processors.forEach(function(process) {
+  runProcessors(domnode) {
+    if (this.props.processors && this.props.processors instanceof Array) {
+      this.props.processors.forEach(function (process) {
         process(domnode);
       });
     }
   },
 
-  showSettings: function() {
+  showSettings() {
     this.refs.admin.show();
   },
 
-  bindSettings: function(settings) {
+  bindSettings(settings) {
     this.connector.setProperties(settings);
-    if(settings.token.trim()) {
+    if (settings.token.trim()) {
       this.setState({ authenticated: true });
     }
   },
 
-  onLogOut: function() {
+  onLogOut() {
     this.setState({ authenticated: false });
   },
 
-  more: function() {
-    this.setState({
-      slice: {
-        start: this.state.slice.start,
-        end: this.state.slice.end + 10
-      }
-    }, this.loadEntries);
+  more() {
+    this.setState(
+      {
+        slice: {
+          start: this.state.slice.start,
+          end: this.state.slice.end + 10,
+        },
+      },
+      this.loadEntries
+    );
   },
 
-  getSlice: function() {
+  getSlice() {
     var list = this.list;
     var start = this.state.slice.start;
     var end = this.state.slice.end;
     var ids = Object.keys(list).sort().reverse().slice(start, end);
-    return ids.map(function(id) { return list[id]; });
+    return ids.map(function (id) {
+      return list[id];
+    });
   },
 
-  loadIndex: function(err, index) {
+  loadIndex(err, index) {
     // latest entry on top
     this.index = index.reverse();
     this.loadEntries();
   },
 
-  loadEntries: function() {
+  loadEntries() {
     var connector = this.connector;
     var setEntry = this.setEntry;
     // find load slice
@@ -167,18 +205,20 @@ module.exports = React.createClass({
     var cache = this.list;
     // run through all
     (function next(list) {
-      if(list.length===0) return;
-      var id = list.splice(0,1)[0];
-      if(cache[id]) return next(list);
-      connector.loadMetadata(id, function(err, metadata) {
-        if(err) {
-          console.error("no metadata found for id: "+id+" ("+err+")");
+      if (list.length === 0) return;
+      var id = list.splice(0, 1)[0];
+      if (cache[id]) return next(list);
+      connector.loadMetadata(id, function (err, metadata) {
+        if (err) {
+          console.error("no metadata found for id: " + id + " (" + err + ")");
           next(list);
           return;
         }
-        connector.loadEntry(id, function(err, postdata) {
-          if(err) {
-            console.error("no post data found for id: "+id+" ("+err+")");
+        connector.loadEntry(id, function (err, postdata) {
+          if (err) {
+            console.error(
+              "no post data found for id: " + id + " (" + err + ")"
+            );
             next(list);
             return;
           }
@@ -186,22 +226,22 @@ module.exports = React.createClass({
           next(list);
         });
       });
-    }(slice));
+    })(slice);
   },
 
-  setEntry: function(id, metadata, postdata) {
+  setEntry(id, metadata, postdata) {
     metadata.id = id;
-    if(this.index.indexOf(id)===-1) {
+    if (this.index.indexOf(id) === -1) {
       this.index.push(id);
     }
     this.list[id] = {
       metadata: metadata,
-      postdata: postdata
+      postdata: postdata,
     };
     this.setState({ entries: this.list });
   },
 
-  create: function() {
+  create() {
     var date = new Date();
     var timestamp = date.getTime();
     var metadata = {
@@ -209,14 +249,14 @@ module.exports = React.createClass({
       created: timestamp,
       published: timestamp, // we can turn this into -1 for drafts
       updated: timestamp,
-      tags: []
+      tags: [],
     };
     var postdata = "...click here to start editing your post...";
     var id = this.timeToId(timestamp);
     this.setEntry(id, metadata, postdata);
   },
 
-  save: function(entry) {
+  save(entry) {
     var self = this;
     this.setEntry(entry.state.id, entry.getMetaData(), entry.postdata);
     this.connector.saveEntry(entry, this.index, function saved() {
@@ -225,14 +265,14 @@ module.exports = React.createClass({
     });
   },
 
-  delete: function(entry) {
+  delete(entry) {
     var confirmed = confirm("really delete post?");
-    if(confirmed) {
+    if (confirmed) {
       var self = this;
       var id = entry.state.id;
       // remove from index:
       var pos = this.index.indexOf(id);
-      this.index.splice(pos,1);
+      this.index.splice(pos, 1);
       // remove from list of loaded entries:
       delete this.list[id];
       this.setState({ entries: this.list });
@@ -243,26 +283,33 @@ module.exports = React.createClass({
     }
   },
 
-  saveRSS: function() {
+  saveRSS() {
     var self = this;
     var connector = this.connector;
     console.log("Updating RSS...");
-    connector.saveRSS(self.toRSS(), function() {
+    connector.saveRSS(self.toRSS(), function () {
       console.log("updated.");
-      if(self.props.rssfeeds) {
+      if (self.props.rssfeeds) {
         console.log("Updating category-specific RSS...");
-        var feeds = self.props.rssfeeds.split(",")
-                                       .map(function(v) { return v.trim(); })
-                                       .filter(function(v) { return !!v; });
+        var feeds = self.props.rssfeeds
+          .split(",")
+          .map(function (v) {
+            return v.trim();
+          })
+          .filter(function (v) {
+            return !!v;
+          });
         (function nextCategory() {
-          if(feeds.length===0) return console.log("All RSS feeds updated");
-          var category = feeds.splice(0,1)[0];
-          console.log("Updating category "+category);
-          connector.saveRSS(self.toRSS(category), category.toLowerCase(), nextCategory);
-        }());
+          if (feeds.length === 0) return console.log("All RSS feeds updated");
+          var category = feeds.splice(0, 1)[0];
+          console.log("Updating category " + category);
+          connector.saveRSS(
+            self.toRSS(category),
+            category.toLowerCase(),
+            nextCategory
+          );
+        })();
       }
     });
-  }
-
+  },
 });
-

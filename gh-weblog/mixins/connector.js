@@ -1,5 +1,6 @@
-module.exports = {
+import Octokit from "../lib/vendor/octokit/octokit.js";
 
+export default {
   Connector: (function() {
 
     var Connector = function(options) {

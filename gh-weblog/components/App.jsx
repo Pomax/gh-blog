@@ -1,20 +1,14 @@
-(function loadBlog() {
+import React from "../lib/vendor/react/react.0.12.min.js";
+import WebLog from "./WebLog.jsx";
 
-  var settings = window.WebLogSettings;
-  var id = settings.target || 'gh-weblog';
-  var target = document.getElementById(id);
+const settings = globalThis.WebLogSettings;
+const id = settings.target || "gh-weblog";
+const target = document.getElementById(id);
 
-  if (!target) {
-    var msg = "no target element with id '"+id+"' found to inject gh-weblog into.";
-    return console.error(msg);
-  }
+if (!target) {
+  const msg =
+    "no target element with id '" + id + "' found to inject gh-weblog into.";
+  console.error(msg);
+}
 
-  var React = require("react");
-
-  if(!React) { return setTimeout(loadBlog, 200); }
-
-  var WebLog = require("./WebLog.jsx");
-
-  React.render(React.createElement(WebLog, settings), target);
-
-}());
+React.render(React.createElement(WebLog, settings), target);

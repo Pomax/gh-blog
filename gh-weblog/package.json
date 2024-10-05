@@ -2,43 +2,22 @@
   "name": "gh-weblog",
   "version": "0.0.1",
   "private": true,
+  "type": "module",
   "scripts": {
-    "test": "gulp test",
-    "build": "gulp"
+    "test": "rm -rf dist && esbuild ./components/App.jsx --bundle --platform=browser --format=esm --keep-names --tree-shaking=false --outfile=./dist/gh-weblog.js"
   },
   "repository": {
     "type": "git",
     "url": "https://github.com/Pomax/gh-blog.git"
   },
   "author": "Pomax",
-  "license": "All rights reserved while a work in progress",
+  "license": "All rights reserved",
   "bugs": {
     "url": "https://github.com/Pomax/gh-blog/issues"
   },
   "homepage": "https://pomax.github.io/gh-blog",
   "devDependencies": {
-    "browserify": "^8.0.3",
-    "browserify-global-shim": "^1.0.0",
-    "browserify-shim": "^3.8.2",
-    "bundle-collapser": "^1.1.1",
-    "gulp": "^3.8.11",
-    "gulp-add": "0.0.2",
-    "gulp-add-src": "^0.2.0",
-    "gulp-concat": "^2.4.3",
-    "gulp-run": "^1.6.6",
-    "gulp-shell": "^0.2.11",
-    "gulp-streamify": "0.0.5",
-    "gulp-uglify": "^1.0.2",
-    "merge-stream": "^0.1.6",
-    "octokit": "^0.10.4",
-    "react": "^0.12.2",
-    "reactify": "^0.17.1",
-    "run-sequence": "^1.0.2",
-    "vinyl-buffer": "^1.0.0",
-    "vinyl-source-stream": "^1.0.0",
-    "vinyl-transform": "^1.0.0"
-  },
-  "dependencies": {
-    "react-onclickoutside": "^0.2.0"
+    "esbuild": "^0.24.0",
+    "express": "^4.21.0"
   }
 }

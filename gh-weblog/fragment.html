@@ -1,41 +1,27 @@
-<!-- Github gh-pages weblog code: -->
+<!-- GH-WebLog content target -->
 <section id="gh-weblog"></section>
+
+<!-- GH-WebLog configuration -->
 <div class="page-requirements">
-  <link rel="stylesheet" href="gh-weblog/style.css">
-  <!-- react in development mode -->
-  <script src='gh-weblog/bower_components/react/react.js'></script>
-  <script src='gh-weblog/bower_components/react/JSXTransformer.js'></script>
-  <!-- for converting Markdown syntax to HTML -->
-  <script src='gh-weblog/bower_components/marked/lib/marked.js'></script>
-  <script src='gh-weblog/mixins/markdown.js'></script>
-  <!-- for interfacing with Github.com -->
-  <script src='gh-weblog/bower_components/octokit/octokit.js'></script>
-  <script src='gh-weblog/mixins/connector.js'></script>
-  <!-- for sensible "onclick out of this element" handling -->
-  <script src='gh-weblog/mixins/onclickoutside.js'></script>
-  <!-- for turning seconds-since-epoch timestamps into yyyy-mm-dd-hh-mm-ss ids -->
-  <script src='gh-weblog/mixins/timetoid.js'></script>
-  <!-- RSS generator, because it's a blog -->
-  <script src='gh-weblog/mixins/rssgenerator.js'></script>
-  <!-- app components -->
-  <script src='gh-weblog/components/Editor.jsx' type='text/jsx'></script>
-  <script src='gh-weblog/components/MarkDown.jsx' type='text/jsx'></script>
-  <script src='gh-weblog/components/Tags.jsx' type='text/jsx'></script>
-  <script src='gh-weblog/components/Entry.jsx' type='text/jsx'></script>
-  <script src='gh-weblog/components/WebLog.jsx' type='text/jsx'></script>
-  <!-- app kickoff -->
-  <script type='text/jsx'>
-    var fragmentId = window.location.hash || false;
-    if(fragmentId) { fragmentId = fragmentId.replace("#gh-weblog-",''); }
-    React.render(<WebLog title="A Github Weblog"
-                         description="A simple github blog using markdown and octokit"
-                         base="http://pomax.github.io/gh-blog"
-                         user="Pomax"
-                         repo="gh-blog"
-                         branch="gh-pages"
-                         path="gh-weblog"
-                         entryid={fragmentId}
-                  />, document.getElementById('gh-weblog'));
+  <link rel="stylesheet" href="gh-weblog/style.css" />
+  <script src="gh-weblog/dist/gh-weblog.js" type="module" async></script>
+  <script>
+    var fragmentId = location.hash || false;
+    if (fragmentId) {
+      fragmentId = fragmentId.replace("#gh-weblog-", "");
+    }
+    React.render(
+      <WebLog
+        title="A Github Weblog"
+        description="A simple github blog using markdown and octokit"
+        base="http://pomax.github.io/gh-blog"
+        user="Pomax"
+        repo="gh-blog"
+        branch="gh-pages"
+        path="gh-weblog"
+        entryid={fragmentId}
+      />,
+      document.getElementById("gh-weblog")
+    );
   </script>
 </div>
-<!-- End of Github gh-pages weblog code -->

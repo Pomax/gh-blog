@@ -1,17 +1,14 @@
-var React = require("react");
-var utils = require("../lib/utils");
+import React from "../lib/vendor/react/react.0.12.min.js";
+import utils from "../lib/utils.js";
+import MarkDown from "./MarkDown.jsx";
+import Editor from "./Editor.jsx";
+import Tags from "./Tags.jsx";
+import onClickOutside from "../mixins/onclickoutside.js";
 
-var MarkDown = require("./MarkDown.jsx");
-var Editor = require("./Editor.jsx");
-var Tags = require("./Tags.jsx");
+export default React.createClass({
+  mixins: [onClickOutside],
 
-module.exports = React.createClass({
-
-  mixins: [
-    require("react-onclickoutside")
-  ],
-
-  getInitialState: function() {
+  getInitialState() {
     return {
       id: -1,
       title: "",
@@ -20,108 +17,133 @@ module.exports = React.createClass({
       updated: Date.now(),
       tags: [],
       editing: false,
-      postdata: ""
+      postdata: "",
     };
   },
 
-  componentDidMount: function() {
+  componentDidMount() {
     var state = this.props.metadata;
     state.postdata = this.props.postdata;
     this.setState(state);
   },
 
-  render: function() {
+  render() {
     var text = this.getText();
     var id = "gh-weblog-" + this.state.created;
     var title = utils.titleReplace(this.state.title);
-    var entryURL = ["/", this.state.created, "/", title].join('');
+    var entryURL = ["/", this.state.created, "/", title].join("");
     var deletebutton;
-    if(this.props.editable) {
-      deletebutton = <button className="admin delete button" onClick={this.delete}>remove entry</button>;
+    if (this.props.editable) {
+      deletebutton = (
+        <button className="admin delete button" onClick={this.delete}>
+          remove entry
+        </button>
+      );
     }
-    var posted = (new Date(this.state.published)).toLocaleString();
-    var updated = (new Date(this.state.updated)).toLocaleString();
+    var posted = new Date(this.state.published).toLocaleString();
+    var updated = new Date(this.state.updated).toLocaleString();
     return (
       <div className="entry" id={id}>
         {deletebutton}
         <header>
-          <h1><a href={entryURL}>{this.state.title}</a></h1>
-          <h2>Originally posted on {posted}, last updated on {updated}</h2>
+          <h1>
+            <a href={entryURL}>{this.state.title}</a>
+          </h1>
+          <h2>
+            Originally posted on {posted}, last updated on {updated}
+          </h2>
         </header>
-        <MarkDown ref="markdown" hidden={this.state.editing} text={this.state.postdata} onClick={this.edit} />
-        <Editor ref="editor" hidden={!this.state.editing} text={text} update={this.update} view={this.view} delete={this.delete} />
-        <a className="comments" href={this.props.issues}>leave a comment on github</a>
-        <Tags disabled={!this.props.editable} tags={this.state.tags} onChange={this.updateTags}/>
+        <MarkDown
+          ref="markdown"
+          hidden={this.state.editing}
+          text={this.state.postdata}
+          onClick={this.edit}
+        />
+        <Editor
+          ref="editor"
+          hidden={!this.state.editing}
+          text={text}
+          update={this.update}
+          view={this.view}
+          delete={this.delete}
+        />
+        <a className="comments" href={this.props.issues}>
+          leave a comment on github
+        </a>
+        <Tags
+          disabled={!this.props.editable}
+          tags={this.state.tags}
+          onChange={this.updateTags}
+        />
       </div>
     );
   },
 
-  componentDidUpdate: function() {
+  componentDidUpdate() {
     this.props.runProcessors(this.refs.markdown.getDOMNode());
   },
 
-  handleClickOutside: function(evt) {
+  handleClickOutside(evt) {
     this.view();
   },
 
-  updateTags: function(tags) {
+  updateTags(tags) {
     var self = this;
-    this.setState({ tags: tags }, function() {
+    this.setState({ tags: tags }, function () {
       this.props.onSave(self);
     });
   },
 
-  getText: function() {
-    return '#' + this.state.title + "\n\n" + this.state.postdata;
+  getText() {
+    return "#" + this.state.title + "\n\n" + this.state.postdata;
   },
 
-  getMetaData: function() {
+  getMetaData() {
     var md = JSON.parse(JSON.stringify(this.state));
     delete md.editing;
     delete md.postdata;
     return md;
   },
 
-  getPostData: function() {
+  getPostData() {
     return this.state.postdata;
   },
 
-  getHTMLData: function() {
+  getHTMLData() {
     return this.refs.markdown.getHTML();
   },
 
-  edit: function() {
-    if(this.props.editable) {
+  edit() {
+    if (this.props.editable) {
       this.refs.editor.setText(this.getText());
       this.setState({ editing: true });
     }
   },
 
-  update: function(evt) {
+  update(evt) {
     var lines = evt.target.value.split("\n");
-    var title = lines.splice(0,1)[0].replace(/^#*/,'');
+    var title = lines.splice(0, 1)[0].replace(/^#*/, "");
     var postdata = lines.join("\n").trim();
     this.setState({
       title: title,
       postdata: postdata,
-      updated: Date.now()
+      updated: Date.now(),
     });
   },
 
-  view: function() {
-    if(this.state.editing) {
+  view() {
+    if (this.state.editing) {
       this.setState({ editing: false });
       this.props.onSave(this);
     }
   },
 
-  delete: function() {
+  delete() {
     this.props.onDelete(this);
   },
 
   // serialise this entry to RSS xml
-  toRSS: function() {
+  toRSS() {
     // ... code goes here ...
-  }
-
+  },
 });

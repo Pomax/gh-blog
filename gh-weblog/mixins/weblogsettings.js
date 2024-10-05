@@ -1,22 +1,22 @@
-module.exports = {
-  settingsName: (function() {
-    var loc = window.location.host;
-    var path = window.location.pathname;
-    loc += (path.lastIndexOf('/') === path.length-1 ? path : '/');
+export default {
+  settingsName: (function () {
+    var loc = location.host;
+    var path = location.pathname;
+    loc += path.lastIndexOf("/") === path.length - 1 ? path : "/";
     return "gh-weblog-settings-" + loc;
-  }()),
+  })(),
 
-  getSettings: function() {
-    var settings = window.localStorage[this.settingsName];
-    if(!settings) return false;
+  getSettings: function () {
+    var settings = localStorage[this.settingsName];
+    if (!settings) return false;
     return JSON.parse(settings);
   },
 
-  saveSettings: function(settings) {
-    window.localStorage[this.settingsName] = JSON.stringify(settings);
+  saveSettings: function (settings) {
+    localStorage[this.settingsName] = JSON.stringify(settings);
   },
 
-  clearSettings: function() {
-    window.localStorage.removeItem(this.settingsName);
-  }
-}
+  clearSettings: function () {
+    localStorage.removeItem(this.settingsName);
+  },
+};
