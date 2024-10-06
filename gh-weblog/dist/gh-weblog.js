@@ -6407,55 +6407,58 @@ var utils_default = {
   }
 };
 
-// mixins/weblogsettings.js
-var weblogsettings_default = {
-  settingsName: function() {
-    var loc = location.host;
-    var path = location.pathname;
-    loc += path.lastIndexOf("/") === path.length - 1 ? path : "/";
-    return "gh-weblog-settings-" + loc;
-  }(),
-  getSettings: /* @__PURE__ */ __name(function() {
-    var settings2 = localStorage[this.settingsName];
-    if (!settings2) return false;
+// lib/weblogsettings.js
+var { pathname, host } = location;
+var suffix = pathname.lastIndexOf("/") === pathname.length - 1 ? path : "/";
+var loc = host + suffix;
+var settingsName = `gh-weblog-settings-${loc}`;
+var WebLogSettings = {
+  getSettings() {
+    const settings2 = localStorage[settingsName];
+    if (!settings2) return;
     return JSON.parse(settings2);
-  }, "getSettings"),
-  saveSettings: /* @__PURE__ */ __name(function(settings2) {
-    localStorage[this.settingsName] = JSON.stringify(settings2);
-  }, "saveSettings"),
-  clearSettings: /* @__PURE__ */ __name(function() {
-    localStorage.removeItem(this.settingsName);
-  }, "clearSettings")
+  },
+  saveSettings(settings2) {
+    localStorage[settingsName] = JSON.stringify(settings2);
+  },
+  clearSettings() {
+    localStorage.removeItem(settingsName);
+  }
 };
+var weblogsettings_default = WebLogSettings;
 
 // components/Admin.jsx
+function stopPropagation(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+}
+__name(stopPropagation, "stopPropagation");
 var Admin_default = react_0_12_min_default.createClass({
-  mixins: [weblogsettings_default],
   getInitialState() {
     return {
       hidden: true,
-      user: "",
-      repo: "",
-      branch: "",
-      path: "gh-weblog",
-      token: ""
+      user: ``,
+      repo: ``,
+      branch: ``,
+      path: `gh-weblog`,
+      token: ``
     };
   },
   componentDidMount() {
-    var obj = this.getSettings();
-    if (obj) {
-      obj.hidden = this.props.hidden;
-      this.setState(obj);
+    const settings2 = weblogsettings_default.getSettings();
+    if (settings2) {
+      settings2.hidden = this.props.hidden;
+      this.setState(settings2);
     }
   },
   render() {
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "underlay", hidden: this.state.hidden, onClick: this.close }, /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "overlay", onClick: this.stopPropagation }, /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "logout", onClick: this.reset }, "Log out"), /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, "Weblog administration settings"), /* @__PURE__ */ react_0_12_min_default.createElement("table", null, /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", null, "Your github username:"), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "underlay", hidden: this.state.hidden, onClick: this.close }, /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "overlay", onClick: stopPropagation }, /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "logout", onClick: this.reset }, "Log out"), /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, "Weblog administration settings"), /* @__PURE__ */ react_0_12_min_default.createElement("table", null, /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", null, "Your github username:"), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
       "input",
       {
         type: "text",
         placeholder: "yourname",
         value: this.state.user,
-        onChange: this.changeUser
+        onChange: (evt) => this.update(`user`, evt)
       }
     ))), /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", null, "github repository:"), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
       "input",
@@ -6463,7 +6466,7 @@ var Admin_default = react_0_12_min_default.createClass({
         type: "text",
         placeholder: "yourname.github.io",
         value: this.state.repo,
-        onChange: this.changeRepo
+        onChange: (evt) => this.update(`repo`, evt)
       }
     ))), /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", null, "repository branch:"), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
       "input",
@@ -6471,14 +6474,14 @@ var Admin_default = react_0_12_min_default.createClass({
         type: "text",
         placeholder: "master",
         value: this.state.branch,
-        onChange: this.changeBranch
+        onChange: (evt) => this.update(`branch`, evt)
       }
     ))), /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", null, "path to weblog:"), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
       "input",
       {
         type: "text",
         value: this.state.path,
-        onChange: this.changePath
+        onChange: (evt) => this.update(`path`, evt)
       }
     )))), /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, "Github", " ", /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: "https://github.com/settings/applications" }, "Personal Access Token")), /* @__PURE__ */ react_0_12_min_default.createElement(
       "input",
@@ -6486,56 +6489,26 @@ var Admin_default = react_0_12_min_default.createClass({
         type: "text",
         className: "token",
         value: this.state.token,
-        onChange: this.changeToken
+        onChange: (evt) => this.update(`token`, evt)
       }
     ), /* @__PURE__ */ react_0_12_min_default.createElement("p", null, "Don't give this token more permissions than necessary! gh-weblog only needs repo access!")));
   },
   reset() {
-    this.clearSettings();
-    this.setState({
-      user: "",
-      repo: "",
-      branch: "",
-      path: "gh-weblog",
-      token: "",
-      hidden: true
-    });
+    weblogsettings_default.clearSettings();
+    this.setState(this.getInitialState());
     this.props.onLogout();
   },
   show() {
     this.setState({ hidden: false });
   },
   close() {
-    this.setState({ hidden: true });
-    this.props.onClose({
-      user: this.state.user,
-      repo: this.state.repo,
-      branch: this.state.branch,
-      path: this.state.path,
-      token: this.state.token
-    });
+    this.setState({ hidden: true }, () => this.props.onClose(this.state));
   },
-  stopPropagation(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
+  update(propName, evt) {
+    this.setState({ [propName]: evt.target.value }, this.updateSettings);
   },
-  changeUser(evt) {
-    this.setState({ user: evt.target.value }, this.update);
-  },
-  changeRepo(evt) {
-    this.setState({ repo: evt.target.value }, this.update);
-  },
-  changeBranch(evt) {
-    this.setState({ branch: evt.target.value }, this.update);
-  },
-  changePath(evt) {
-    this.setState({ path: evt.target.value }, this.update);
-  },
-  changeToken(evt) {
-    this.setState({ token: evt.target.value }, this.update);
-  },
-  update() {
-    this.saveSettings(this.state);
+  updateSetting() {
+    weblogsettings_default.saveSettings(this.state);
   }
 });
 
@@ -7335,7 +7308,7 @@ var marked_default = marked;
 // components/MarkDown.jsx
 var MarkDown_default = react_0_12_min_default.createClass({
   render() {
-    var html = { __html: marked_default(this.props.text) };
+    const html = { __html: marked_default(this.props.text) };
     return /* @__PURE__ */ react_0_12_min_default.createElement(
       "div",
       {
@@ -7354,13 +7327,13 @@ var MarkDown_default = react_0_12_min_default.createClass({
 
 // components/Editor.jsx
 var Editor_default = react_0_12_min_default.createClass({
-  getInitialState: /* @__PURE__ */ __name(function() {
+  getInitialState() {
     return { text: "" };
-  }, "getInitialState"),
-  componentDidMount: /* @__PURE__ */ __name(function() {
+  },
+  componentDidMount() {
     this.setState({ text: this.props.text });
-  }, "componentDidMount"),
-  render: /* @__PURE__ */ __name(function() {
+  },
+  render() {
     return /* @__PURE__ */ react_0_12_min_default.createElement(
       "textarea",
       {
@@ -7371,114 +7344,38 @@ var Editor_default = react_0_12_min_default.createClass({
         onChange: this.record
       }
     );
-  }, "render"),
-  setText: /* @__PURE__ */ __name(function(text) {
-    var textarea = this.refs.textarea.getDOMNode();
-    this.setState({ text }, function() {
-      textarea.focus();
-    });
-  }, "setText"),
-  record: /* @__PURE__ */ __name(function(evt) {
+  },
+  setText(text) {
+    const textarea = this.refs.textarea.getDOMNode();
+    this.setState({ text }, () => textarea.focus());
+  },
+  record(evt) {
     this.setState({ text: evt.target.value });
     this.props.update(evt);
-  }, "record"),
-  finish: /* @__PURE__ */ __name(function(evt) {
-    this.props.view();
-  }, "finish")
+  }
 });
 
 // components/Tags.jsx
 var Tags_default = react_0_12_min_default.createClass({
   render() {
-    var tags = this.props.tags.map(function(tag, idx) {
+    const tags = this.props.tags.map(function(tag, idx) {
       return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "tag", key: idx }, tag);
     });
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "tags", onClick: this.updateTags }, tags);
   },
   updateTags() {
     if (this.props.disabled) return;
-    var tags = this.props.tags.join(", ");
-    var newtags = prompt("Edit the post tags", tags);
-    tags = newtags.split(",").map(function(v) {
-      return v.trim();
-    });
-    this.props.onChange(tags);
+    let tags = this.props.tags.join(", ");
+    const newTags = prompt("Edit the post tags", tags);
+    if (newTags) {
+      tags = newTags.split(",").map((v) => v.trim());
+      this.props.onChange(tags);
+    }
   }
 });
 
-// mixins/onclickoutside.js
-var registeredComponents = [];
-var handlers = [];
-var IGNORE_CLASS = "ignore-react-onclickoutside";
-var isSourceFound = /* @__PURE__ */ __name(function(source, localNode) {
-  if (source === localNode) {
-    return true;
-  }
-  if (source.correspondingElement) {
-    return source.correspondingElement.classList.contains(IGNORE_CLASS);
-  }
-  return source.classList.contains(IGNORE_CLASS);
-}, "isSourceFound");
-var onclickoutside_default = {
-  componentDidMount: /* @__PURE__ */ __name(function() {
-    if (typeof this.handleClickOutside !== "function")
-      throw new Error(
-        "Component lacks a handleClickOutside(event) function for processing outside click events."
-      );
-    var fn = this.__outsideClickHandler = /* @__PURE__ */ function(localNode, eventHandler) {
-      return function(evt) {
-        evt.stopPropagation();
-        var source = evt.target;
-        var found = false;
-        while (source.parentNode) {
-          found = isSourceFound(source, localNode);
-          if (found) return;
-          source = source.parentNode;
-        }
-        eventHandler(evt);
-      };
-    }(this.getDOMNode(), this.handleClickOutside);
-    var pos = registeredComponents.length;
-    registeredComponents.push(this);
-    handlers[pos] = fn;
-    if (!this.props.disableOnClickOutside) {
-      this.enableOnClickOutside();
-    }
-  }, "componentDidMount"),
-  componentWillUnmount: /* @__PURE__ */ __name(function() {
-    this.disableOnClickOutside();
-    this.__outsideClickHandler = false;
-    var pos = registeredComponents.indexOf(this);
-    if (pos > -1) {
-      if (handlers[pos]) {
-        handlers.splice(pos, 1);
-        registeredComponents.splice(pos, 1);
-      }
-    }
-  }, "componentWillUnmount"),
-  /**
-   * Can be called to explicitly enable event listening
-   * for clicks and touches outside of this element.
-   */
-  enableOnClickOutside: /* @__PURE__ */ __name(function() {
-    var fn = this.__outsideClickHandler;
-    document.addEventListener("mousedown", fn);
-    document.addEventListener("touchstart", fn);
-  }, "enableOnClickOutside"),
-  /**
-   * Can be called to explicitly disable event listening
-   * for clicks and touches outside of this element.
-   */
-  disableOnClickOutside: /* @__PURE__ */ __name(function() {
-    var fn = this.__outsideClickHandler;
-    document.removeEventListener("mousedown", fn);
-    document.removeEventListener("touchstart", fn);
-  }, "disableOnClickOutside")
-};
-
 // components/Entry.jsx
 var Entry_default = react_0_12_min_default.createClass({
-  mixins: [onclickoutside_default],
   getInitialState() {
     return {
       id: -1,
@@ -7492,22 +7389,24 @@ var Entry_default = react_0_12_min_default.createClass({
     };
   },
   componentDidMount() {
-    var state = this.props.metadata;
-    state.postdata = this.props.postdata;
-    this.setState(state);
+    const { metadata, postdata } = this.props;
+    metadata.postdata = postdata;
+    this.setState(metadata);
+    const root = document.querySelector(`:root`);
+    root.addEventListener(`click`, (evt) => {
+      if (evt.target !== root) return;
+      this.view();
+    });
   },
   render() {
-    var text = this.getText();
-    var id2 = "gh-weblog-" + this.state.created;
-    var title = utils_default.titleReplace(this.state.title);
-    var entryURL = ["/", this.state.created, "/", title].join("");
-    var deletebutton;
+    const title = utils_default.titleReplace(this.state.title);
+    let deleteButton;
     if (this.props.editable) {
-      deletebutton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin delete button", onClick: this.delete }, "remove entry");
+      deleteButton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin delete button", onClick: this.delete }, "remove entry");
     }
-    var posted = new Date(this.state.published).toLocaleString();
-    var updated = new Date(this.state.updated).toLocaleString();
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: id2 }, deletebutton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: entryURL }, this.state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
+    const posted = new Date(this.state.published).toLocaleString();
+    const updated = new Date(this.state.updated).toLocaleString();
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${this.state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `/${this.state.created}/${title}` }, this.state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
       MarkDown_default,
       {
         ref: "markdown",
@@ -7520,7 +7419,7 @@ var Entry_default = react_0_12_min_default.createClass({
       {
         ref: "editor",
         hidden: !this.state.editing,
-        text,
+        text: this.getText(),
         update: this.update,
         view: this.view,
         delete: this.delete
@@ -7537,20 +7436,16 @@ var Entry_default = react_0_12_min_default.createClass({
   componentDidUpdate() {
     this.props.runProcessors(this.refs.markdown.getDOMNode());
   },
-  handleClickOutside(evt) {
-    this.view();
-  },
   updateTags(tags) {
-    var self = this;
-    this.setState({ tags }, function() {
-      this.props.onSave(self);
-    });
+    this.setState({ tags }, () => this.props.onSave(this));
   },
   getText() {
-    return "#" + this.state.title + "\n\n" + this.state.postdata;
+    return `#${this.state.title}
+
+${this.state.postdata}`;
   },
   getMetaData() {
-    var md = JSON.parse(JSON.stringify(this.state));
+    const md = JSON.parse(JSON.stringify(this.state));
     delete md.editing;
     delete md.postdata;
     return md;
@@ -7568,14 +7463,10 @@ var Entry_default = react_0_12_min_default.createClass({
     }
   },
   update(evt) {
-    var lines = evt.target.value.split("\n");
-    var title = lines.splice(0, 1)[0].replace(/^#*/, "");
-    var postdata = lines.join("\n").trim();
-    this.setState({
-      title,
-      postdata,
-      updated: Date.now()
-    });
+    const lines = evt.target.value.split("\n");
+    const title = lines.splice(0, 1)[0].replace(/^#*/, "");
+    const postdata = lines.join("\n").trim();
+    this.setState({ title, postdata, updated: Date.now() });
   },
   view() {
     if (this.state.editing) {
@@ -7587,7 +7478,24 @@ var Entry_default = react_0_12_min_default.createClass({
     this.props.onDelete(this);
   },
   // serialise this entry to RSS xml
-  toRSS() {
+  toRSS(base, category) {
+    if (category && entry.state.tags.indexOf(category) === -1) {
+      return false;
+    }
+    var html = this.getHTMLData();
+    var safifier = document.createElement("div");
+    safifier.textContent = html;
+    return `
+    <item>
+      <title>${this.state.title}</title>
+      <description>${safifier.innerHTML}</description>
+      ${this.state.tags.map((tag) => `<category>${tag}</category>`).join(`
+      `)}
+      <link>${base}/#gh-weblog-${this.state.published}</link>
+      <guid>${base}/#gh-weblog-${this.state.published}</guid>
+      <pubDate>${new Date(this.state.published).toUTCString()}</pubDate>
+    </item>
+`;
   }
 });
 
@@ -7768,19 +7676,19 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         return ETagResponse2;
       }();
       _cachedETags = {};
-      notifyStart = /* @__PURE__ */ __name(function(promise, path) {
+      notifyStart = /* @__PURE__ */ __name(function(promise, path2) {
         return typeof promise.notify === "function" ? promise.notify({
           type: "start",
-          path
+          path: path2
         }) : void 0;
       }, "notifyStart");
-      notifyEnd = /* @__PURE__ */ __name(function(promise, path) {
+      notifyEnd = /* @__PURE__ */ __name(function(promise, path2) {
         return typeof promise.notify === "function" ? promise.notify({
           type: "end",
-          path
+          path: path2
         }) : void 0;
       }, "notifyEnd");
-      _request = /* @__PURE__ */ __name(function(method, path, data, options) {
+      _request = /* @__PURE__ */ __name(function(method, path2, data, options) {
         var auth, headers, mimeType, promise;
         if (options == null) {
           options = {
@@ -7792,8 +7700,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         if ("PATCH" === method && clientOptions.usePostInsteadOfPatch) {
           method = "POST";
         }
-        if (!/^http/.test(path)) {
-          path = "" + clientOptions.rootURL + path;
+        if (!/^http/.test(path2)) {
+          path2 = "" + clientOptions.rootURL + path2;
         }
         mimeType = void 0;
         if (options.isBase64) {
@@ -7805,8 +7713,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         if (userAgent) {
           headers["User-Agent"] = userAgent;
         }
-        if (path in _cachedETags) {
-          headers["If-None-Match"] = _cachedETags[path].eTag;
+        if (path2 in _cachedETags) {
+          headers["If-None-Match"] = _cachedETags[path2].eTag;
         } else {
           headers["If-Modified-Since"] = "Thu, 01 Jan 1970 00:00:00 GMT";
         }
@@ -7823,7 +7731,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         promise = newPromise2(function(resolve, reject) {
           var ajaxConfig, always, onError, xhrPromise, _this2 = this;
           ajaxConfig = {
-            url: path,
+            url: path2,
             type: method,
             contentType: "application/json",
             mimeType,
@@ -7845,7 +7753,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           xhrPromise = ajax(ajaxConfig);
           always = /* @__PURE__ */ __name(function(jqXHR) {
             var listener, rateLimit, rateLimitRemaining, _i, _len, _results;
-            notifyEnd(_this2, path);
+            notifyEnd(_this2, path2);
             rateLimit = parseFloat(
               jqXHR.getResponseHeader("X-RateLimit-Limit")
             );
@@ -7860,7 +7768,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
                   rateLimitRemaining,
                   rateLimit,
                   method,
-                  path,
+                  path2,
                   data,
                   options
                 )
@@ -7872,8 +7780,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             var converted, eTag, eTagResponse, i, links, valOptions, _i, _ref2;
             always(jqXHR);
             if (304 === jqXHR.status) {
-              if (clientOptions.useETags && _cachedETags[path]) {
-                eTagResponse = _cachedETags[path];
+              if (clientOptions.useETags && _cachedETags[path2]) {
+                eTagResponse = _cachedETags[path2];
                 return resolve(eTagResponse.data, eTagResponse.status, jqXHR);
               } else {
                 return resolve(jqXHR.responseText, status, jqXHR);
@@ -7908,7 +7816,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               }
               if ("GET" === method && jqXHR.getResponseHeader("ETag") && clientOptions.useETags) {
                 eTag = jqXHR.getResponseHeader("ETag");
-                _cachedETags[path] = new ETagResponse(eTag, data, jqXHR.status);
+                _cachedETags[path2] = new ETagResponse(eTag, data, jqXHR.status);
               }
               return resolve(data, jqXHR.status, jqXHR);
             }
@@ -7940,7 +7848,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           }, "onError");
           return (typeof xhrPromise["catch"] === "function" ? xhrPromise["catch"](onError) : void 0) || xhrPromise.fail(onError);
         });
-        notifyStart(promise, path);
+        notifyStart(promise, path2);
         return promise;
       }, "_request");
       toQueryString = /* @__PURE__ */ __name(function(options) {
@@ -8386,9 +8294,9 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               isBase64
             });
           };
-          this.getSha = function(branch, path) {
+          this.getSha = function(branch, path2) {
             var _this2 = this;
-            if (path === "") {
+            if (path2 === "") {
               return this.getRef("heads/" + branch);
             }
             return this.getTree(branch, {
@@ -8396,7 +8304,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             }).then(function(tree) {
               var file;
               file = _.select(tree, function(file2) {
-                return file2.path === path;
+                return file2.path === path2;
               })[0];
               if (file != null ? file.sha : void 0) {
                 return file != null ? file.sha : void 0;
@@ -8406,7 +8314,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.getContents = function(path, sha) {
+          this.getContents = function(path2, sha) {
             var queryString, _this2 = this;
             if (sha == null) {
               sha = null;
@@ -8419,7 +8327,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             }
             return _request(
               "GET",
-              "" + _repoPath + "/contents/" + path + queryString,
+              "" + _repoPath + "/contents/" + path2 + queryString,
               null,
               {
                 raw: true
@@ -8428,7 +8336,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               return contents;
             });
           };
-          this.removeFile = function(path, message, sha, branch) {
+          this.removeFile = function(path2, message, sha, branch) {
             var params;
             params = {
               message,
@@ -8437,7 +8345,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             };
             return _request(
               "DELETE",
-              "" + _repoPath + "/contents/" + path,
+              "" + _repoPath + "/contents/" + path2,
               params,
               null
             );
@@ -8594,10 +8502,10 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.read = function(path, isBase64) {
+          this.read = function(path2, isBase64) {
             var _this2 = this;
             return _getRef().then(function(branch) {
-              return _git.getSha(branch, path).then(function(sha) {
+              return _git.getSha(branch, path2).then(function(sha) {
                 return _git.getBlob(sha, isBase64).then(function(bytes) {
                   return {
                     sha,
@@ -8607,38 +8515,38 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.contents = function(path) {
+          this.contents = function(path2) {
             var _this2 = this;
             return _getRef().then(function(branch) {
               return _git.getSha(branch, "").then(function(sha) {
-                return _git.getContents(path, sha).then(function(contents) {
+                return _git.getContents(path2, sha).then(function(contents) {
                   return contents;
                 });
               });
             });
           };
-          this.remove = function(path, message, sha) {
+          this.remove = function(path2, message, sha) {
             var _this2 = this;
             if (message == null) {
-              message = "Removed " + path;
+              message = "Removed " + path2;
             }
             if (sha == null) {
               sha = null;
             }
             return _getRef().then(function(branch) {
               if (sha) {
-                return _git.removeFile(path, message, sha, branch);
+                return _git.removeFile(path2, message, sha, branch);
               } else {
-                return _git.getSha(branch, path).then(function(sha2) {
-                  return _git.removeFile(path, message, sha2, branch);
+                return _git.getSha(branch, path2).then(function(sha2) {
+                  return _git.removeFile(path2, message, sha2, branch);
                 });
               }
             });
           };
-          this.move = function(path, newPath, message) {
+          this.move = function(path2, newPath, message) {
             var _this2 = this;
             if (message == null) {
-              message = "Moved " + path;
+              message = "Moved " + path2;
             }
             return _getRef().then(function(branch) {
               return _git._updateTree(branch).then(function(latestCommit) {
@@ -8646,7 +8554,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
                   recursive: true
                 }).then(function(tree) {
                   _.each(tree, function(ref) {
-                    if (ref.path === path) {
+                    if (ref.path === path2) {
                       ref.path = newPath;
                     }
                     if (ref.type === "tree") {
@@ -8664,16 +8572,16 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.write = function(path, content, message, isBase64, parentCommitSha) {
+          this.write = function(path2, content, message, isBase64, parentCommitSha) {
             var contents;
             if (message == null) {
-              message = "Changed " + path;
+              message = "Changed " + path2;
             }
             if (parentCommitSha == null) {
               parentCommitSha = null;
             }
             contents = {};
-            contents[path] = {
+            contents[path2] = {
               content,
               isBase64
             };
@@ -8692,13 +8600,13 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               afterParentCommitShas = /* @__PURE__ */ __name(function(parentCommitShas2) {
                 var promises;
                 promises = _.map(_.pairs(contents), function(_arg) {
-                  var content, data, isBase64, path, _this3 = this;
-                  path = _arg[0], data = _arg[1];
+                  var content, data, isBase64, path2, _this3 = this;
+                  path2 = _arg[0], data = _arg[1];
                   content = data.content || data;
                   isBase64 = data.isBase64 || false;
                   return _git.postBlob(content, isBase64).then(function(blob) {
                     return {
-                      path,
+                      path: path2,
                       mode: "100644",
                       type: "blob",
                       sha: blob
@@ -8776,12 +8684,12 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           this.getInfo = function() {
             return _request("GET", this.repoPath, null);
           };
-          this.getContents = function(branch, path) {
+          this.getContents = function(branch, path2) {
             return _request(
               "GET",
               "" + this.repoPath + "/contents?ref=" + branch,
               {
-                path
+                path: path2
               }
             );
           };
@@ -9089,230 +8997,187 @@ allPromises = /* @__PURE__ */ __name(function(promises) {
 Octokit = makeOctokit(newPromise, allPromises, XMLHttpRequest, btoa, "octokit");
 var octokit_default = Octokit;
 
-// mixins/connector.js
-var connector_default = {
-  Connector: function() {
-    var Connector = /* @__PURE__ */ __name(function(options) {
-      if (options && options.token && options.token.trim()) {
-        this.options = options;
-        this.setProperties(options);
+// lib/connector.js
+var Connector = class {
+  static {
+    __name(this, "Connector");
+  }
+  constructor(options) {
+    if (options && options.token && options.token.trim()) {
+      this.options = options;
+      this.setProperties(options);
+    } else {
+      this.options = {
+        path: "gh-weblog"
+      };
+    }
+  }
+  setProperties(options) {
+    this.path = options.path;
+    this.repo = new octokit_default({ token: options.token }).getRepo(
+      options.user,
+      options.repo
+    );
+    this.branch = this.repo.getBranch(options.branch);
+  }
+  get(url, options, processData) {
+    if (options && !processData) {
+      processData = options;
+      options = {};
+    }
+    const xhr = new XMLHttpRequest();
+    xhr.open("GET", `${url}?t=${Date.now()}`, true);
+    Object.keys(options).forEach(function(key) {
+      xhr[key] = options[key];
+    });
+    xhr.onreadystatechange = function(evt) {
+      if (xhr.status === 0 || xhr.status === 200) {
+        if (xhr.readyState === 4) {
+          const obj = evt.target.response;
+          processData(!obj, obj);
+        }
       } else {
-        this.options = {
-          path: "gh-weblog"
-        };
+        processData(`xhr error ${xhr.status} for ${url}`);
       }
-    }, "Connector");
-    Connector.prototype = {
-      setProperties: /* @__PURE__ */ __name(function(options) {
-        this.path = options.path;
-        var octokit = new octokit_default({ token: options.token });
-        this.repo = octokit.getRepo(options.user, options.repo);
-        this.branch = this.repo.getBranch(options.branch);
-      }, "setProperties"),
-      // We don't need zepto or jquery for an xhr .get()
-      get: /* @__PURE__ */ __name(function(url, options, processData) {
-        if (options && !processData) {
-          processData = options;
-          options = {};
-        }
-        var xhr = new XMLHttpRequest();
-        var cachebuster = "?cb=" + Date.now();
-        xhr.open("GET", url + cachebuster, true);
-        Object.keys(options).forEach(function(key) {
-          xhr[key] = options[key];
-        });
-        xhr.onreadystatechange = function(evt) {
-          if (xhr.status === 0 || xhr.status === 200) {
-            if (xhr.readyState === 4) {
-              var obj = evt.target.response;
-              processData(!obj, obj);
-            }
-          } else {
-            processData("xhr error " + xhr.status + " for " + url, false);
-          }
-        };
-        xhr.onerror = function(evt) {
-        };
-        xhr.send(null);
-      }, "get"),
-      // And we also don't need zepto or jquery for an xhr .json()
-      json: /* @__PURE__ */ __name(function(url, processData) {
-        this.get(url, function(err2, data) {
-          if (err2) {
-            return console.error(err2);
-          }
-          try {
-            var obj = JSON.parse(data);
-            processData(false, obj);
-          } catch (error) {
-            processdata(error);
-          }
-        });
-      }, "json"),
-      loadIndex: /* @__PURE__ */ __name(function(handleIndex, entryId) {
-        this.json(this.options.path + "/content/posts/index.json", function(err2, result) {
-          if (entryId) {
-            return handleIndex(err2, result ? [entryId] : false);
-          }
-          handleIndex(err2, result ? result.index.sort() : false);
-        });
-      }, "loadIndex"),
-      loadMetadata: /* @__PURE__ */ __name(function(id2, handleMetadata) {
-        this.json(this.options.path + "/content/posts/metadata/" + id2 + ".json", function(err2, result) {
-          handleMetadata(err2, result);
-        });
-      }, "loadMetadata"),
-      loadEntry: /* @__PURE__ */ __name(function(id2, handleEntry) {
-        this.get(this.options.path + "/content/posts/markdown/" + id2 + ".md", function(err2, result) {
-          handleEntry(err2, result);
-        });
-      }, "loadEntry"),
-      saveEntry: /* @__PURE__ */ __name(function(entry, index, saved) {
-        var id2 = entry.state.id, path = this.options.path + "/content/posts/", index = JSON.stringify({ index: index.sort() }, false, 2), indexFilename = path + "index.json", metadata = JSON.stringify(entry.getMetaData(), false, 2), metadataFilename = path + "metadata/" + id2 + ".json", postdata = entry.getPostData(), postdataFilename = path + "markdown/" + id2 + ".md", commitMessage = "Saving new entry " + id2, content = {};
-        content[indexFilename] = index;
-        content[metadataFilename] = metadata;
-        content[postdataFilename] = postdata;
-        try {
-          this.branch.writeMany(content, commitMessage).then(function() {
-            console.log("Saved entry " + id2 + " to github.");
-            if (saved) saved(entry);
-          });
-        } catch (e) {
-          console.error("saving went horribly wrong");
-          throw e;
-        }
-      }, "saveEntry"),
-      updateEntry: /* @__PURE__ */ __name(function(entry, updated) {
-        var id2 = entry.state.id;
-        console.log("Updating " + id2);
-        var path = this.options.path + "/content/posts/", metadata = JSON.stringify(entry.getMetaData(), false, 2), metadataFilename = path + "metadata/" + id2 + ".json", postdata = entry.getPostData(), postdataFilename = path + "markdown/" + id2 + ".md", commitMessage = "Updating entry " + id2, content = {};
-        content[metadataFilename] = metadata;
-        content[postdataFilename] = postdata;
-        try {
-          this.branch.writeMany(content, commitMessage).then(function() {
-            console.log("Updated entry " + id2 + " on github.");
-            if (updated) updated(entry);
-          });
-        } catch (e) {
-          console.error("updating went horribly wrong");
-          throw e;
-        }
-      }, "updateEntry"),
-      deleteEntry: /* @__PURE__ */ __name(function(entry, index, deleted) {
-        var id2 = entry.state.id;
-        console.log("Deleting " + id2);
-        var path = this.options.path + "/content/posts/";
-        var indexFilename = path + "index.json";
-        var index = JSON.stringify({ index: index.sort() }, false, 2);
-        var metadataFilename = path + "metadata/" + id2 + ".json";
-        var postdataFilename = path + "markdown/" + id2 + ".md";
-        var commitMessage = "Removing entry " + id2;
-        var branch = this.branch;
-        try {
-          branch.write(indexFilename, index, commitMessage).then(function() {
-            return branch.remove(metadataFilename, commitMessage);
-          }).then(function() {
-            return branch.remove(postdataFilename, commitMessage);
-          }).then(function() {
-            console.log("Removed entry " + id2 + " from github.");
-            if (deleted) deleted(entry);
-          });
-        } catch (e) {
-          console.error("deleting went horribly wrong");
-          throw e;
-        }
-      }, "deleteEntry"),
-      saveRSS: /* @__PURE__ */ __name(function(rss, category, updated) {
-        if (typeof category === "function") {
-          updated = category;
-          category = false;
-        }
-        var rssFilename = this.options.path + "/" + (category ? category + "-" : "") + "rss.xml";
-        var commitMessage = "Update to RSS XML";
-        try {
-          this.branch.write(rssFilename, rss, commitMessage).then(function() {
-            console.log("Updated RSS on github.");
-            if (updated) updated();
-          });
-        } catch (e) {
-          console.error("updating RSS went horribly wrong");
-          throw e;
-        }
-      }, "saveRSS")
     };
-    return Connector;
-  }()
+    xhr.onerror = processData;
+    xhr.send(null);
+  }
+  json(url, processData) {
+    this.get(url, function(err2, data) {
+      if (err2) {
+        return console.error(err2);
+      }
+      try {
+        processData(false, JSON.parse(data));
+      } catch (error) {
+        processData(error);
+      }
+    });
+  }
+  loadIndex(handleIndex, entryId) {
+    this.json(
+      `${this.options.path}/content/posts/index.json`,
+      function(err2, result) {
+        if (entryId) {
+          return handleIndex(err2, result ? [entryId] : false);
+        }
+        handleIndex(err2, result ? result.index.sort() : false);
+      }
+    );
+  }
+  loadMetadata(id2, handleMetadata) {
+    this.json(
+      `${this.options.path}/content/posts/metadata/${id2}.json`,
+      function(err2, result) {
+        handleMetadata(err2, result);
+      }
+    );
+  }
+  loadEntry(id2, handleEntry) {
+    this.get(
+      `${this.options.path}/content/posts/markdown/${id2}.md`,
+      function(err2, result) {
+        handleEntry(err2, result);
+      }
+    );
+  }
+  saveEntry(entry2, index, saved) {
+    const id2 = entry2.state.id;
+    const path2 = `${this.options.path}/content/posts/`;
+    const commitMessage = `Saving new entry ${id2}`;
+    const content = {};
+    const indexdata = JSON.stringify({ index: index.sort() }, false, 2);
+    const indexFilename = `${path2}index.json`;
+    content[indexFilename] = indexdata;
+    const metadata = JSON.stringify(entry2.getMetaData(), false, 2);
+    const metadataFilename = `${path2}metadata/${id2}.json`;
+    content[metadataFilename] = metadata;
+    const postData = entry2.getpostData();
+    const postDataFilename = `${path2}markdown/${id2}.md`;
+    content[postDataFilename] = postData;
+    try {
+      this.branch.writeMany(content, commitMessage).then(function() {
+        console.log(`Saved entry ${id2} to github.`);
+        if (saved) saved(entry2);
+      });
+    } catch (e) {
+      console.error(`saving went horribly wrong`);
+      throw e;
+    }
+  }
+  updateEntry(entry2, updated) {
+    const id2 = entry2.state.id;
+    const path2 = `${this.options.path}/content/posts/`;
+    const content = {};
+    const commitMessage = `Updating entry ${id2}`;
+    const metadata = JSON.stringify(entry2.getMetaData(), false, 2);
+    const metadataFilename = `${path2}metadata/${id2}.json`;
+    content[metadataFilename] = metadata;
+    const postData = entry2.getpostData();
+    const postDataFilename = `${path2}markdown/${id2}.md`;
+    content[postDataFilename] = postData;
+    try {
+      this.branch.writeMany(content, commitMessage).then(function() {
+        console.log(`Updated entry ${id2} on github.`);
+        if (updated) updated(entry2);
+      });
+    } catch (e) {
+      console.error(`updating went horribly wrong`);
+      throw e;
+    }
+  }
+  deleteEntry(entry2, index, deleted) {
+    const id2 = entry2.state.id;
+    const path2 = `${this.options.path}/content/posts/`;
+    const commitMessage = `Removing entry ${id2}`;
+    const indexdata = JSON.stringify({ index: index.sort() }, false, 2);
+    const indexFilename = `${path2}index.json`;
+    const metadataFilename = `${path2}metadata/${id2}.json`;
+    const postDataFilename = `${path2}markdown/${id2}.md`;
+    const branch = this.branch;
+    try {
+      branch.write(indexFilename, indexdata, commitMessage).then(() => branch.remove(metadataFilename, commitMessage)).then(() => branch.remove(postDataFilename, commitMessage)).then(() => {
+        console.log(`Removed entry ${id2} from github.`);
+        if (deleted) deleted(entry2);
+      });
+    } catch (e) {
+      console.error(`deleting went horribly wrong`);
+      throw e;
+    }
+  }
+  saveRSS(rss, category, updated) {
+    if (typeof category === "function") {
+      updated = category;
+      category = false;
+    }
+    category = category ? `${category}-` : ``;
+    const rssFilename = `${this.options.path}/${category}rss.xml`;
+    const commitMessage = `Update to RSS XML`;
+    try {
+      this.branch.write(rssFilename, rss, commitMessage).then(() => {
+        console.log(`Updated RSS on github.`);
+        if (updated) updated();
+      });
+    } catch (e) {
+      console.error(`updating RSS went horribly wrong`);
+      throw e;
+    }
+  }
 };
 
-// mixins/timetoid.js
-var timetoid_default = {
-  timeToId: /* @__PURE__ */ __name(function(timestamp) {
-    if (!timestamp) return false;
-    var d = new Date(parseInt(timestamp, 10));
-    var s = d.toISOString();
-    var id2 = s.replace("T", "-").replace(/\..*/, "").replace(/\:/g, "-");
-    return id2;
-  }, "timeToId")
-};
-
-// mixins/rssgenerator.js
-var rssgenerator_default = {
-  /**
-   * So, this is weird given that
-   */
-  toRSS: /* @__PURE__ */ __name(function(category) {
-    var self = this;
-    var base = this.props.base;
-    if (this.state.singleton) return;
-    if (this.state.slice.start >= 10) return;
-    var rssHeading = [
-      '<?xml version="1.0" encoding="UTF-8" ?>',
-      '<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">',
-      "<channel>",
-      '<atom:link href="' + this.props.base + "/" + this.props.path + '/rss.xml" rel="self" type="application/rss+xml" />',
-      "<title>" + this.props.title + "</title>",
-      "<description>" + this.props.description + (category ? " [" + category + " posts only]" : "") + "</description>",
-      "<link>" + base + "</link>",
-      "<lastBuildDate>" + (/* @__PURE__ */ new Date()).toUTCString() + "</lastBuildDate>",
-      "<pubDate>" + (/* @__PURE__ */ new Date()).toUTCString() + "</pubDate>",
-      "<ttl>1440</ttl>"
-    ].join("\n") + "\n";
-    var entryIds = Object.keys(this.list).sort().reverse().slice(0, 10);
-    var entriesRSS = entryIds.map(function(id2) {
-      var entry = self.refs[id2];
-      if (category && entry.state.tags.indexOf(category) === -1) return "";
-      var html = entry.getHTMLData();
-      var safifier = document.createElement("div");
-      safifier.textContent = html;
-      var rsshtml = safifier.innerHTML;
-      var rssForm = [
-        "<item>",
-        "<title>" + entry.state.title + "</title>",
-        "<description>" + rsshtml + "</description>",
-        entry.state.tags.map(function(tag) {
-          return "<category>" + tag + "</category>";
-        }).join("\n"),
-        "<link>" + base + "/#gh-weblog-" + entry.state.published + "</link>",
-        "<guid>" + base + "/#gh-weblog-" + entry.state.published + "</guid>",
-        "<pubDate>" + new Date(entry.state.published).toUTCString() + "</pubDate>",
-        "</item>"
-      ];
-      return rssForm.join("\n");
-    }).filter(function(v) {
-      return !!v;
-    }).join("\n");
-    var rssTail = [
-      "</channel>",
-      "</rss>"
-    ].join("\n") + "\n";
-    var rss = rssHeading + entriesRSS + rssTail;
-    return rss;
-  }, "toRSS")
-};
+// lib/timetoid.js
+function timeToId(timestamp) {
+  if (!timestamp) return false;
+  var d = new Date(parseInt(timestamp, 10));
+  var s = d.toISOString();
+  var id2 = s.replace("T", "-").replace(/\..*/, "").replace(/\:/g, "-");
+  return id2;
+}
+__name(timeToId, "timeToId");
 
 // components/WebLog.jsx
 var WebLog_default = react_0_12_min_default.createClass({
-  mixins: [connector_default, timetoid_default, rssgenerator_default, weblogsettings_default],
   // local cache, because we don't want to load the entire
   // index at once, and we don't want to requery for it.
   index: [],
@@ -9331,9 +9196,9 @@ var WebLog_default = react_0_12_min_default.createClass({
     };
   },
   componentDidMount() {
-    var settings2 = this.getSettings();
+    const settings2 = weblogsettings_default.getSettings();
     if (settings2) {
-      this.connector = new this.Connector(settings2);
+      this.connector = new Connector(settings2);
       if (settings2.token) {
         this.setState({ authenticated: true });
       }
@@ -9348,7 +9213,7 @@ var WebLog_default = react_0_12_min_default.createClass({
         fragmentId = false;
       }
     }
-    var id2 = this.timeToId(fragmentId);
+    var id2 = timeToId(fragmentId);
     if (id2) {
       this.setState({ singleton: true });
     }
@@ -9356,8 +9221,8 @@ var WebLog_default = react_0_12_min_default.createClass({
     var a = document.createElement("a");
     a.href = this.props.base;
     var user = a.host.replace(".github.io", "");
-    var path = a.pathname.replace(/^\//, "").trim().split("/")[0];
-    var repo = path ? path : a.host;
+    var path2 = a.pathname.replace(/^\//, "").trim().split("/")[0];
+    var repo = path2 ? path2 : a.host;
     this.setState({
       site: "http://github.com/" + user + "/" + repo,
       issues: "http://github.com/" + user + "/" + repo + "/issues"
@@ -9381,14 +9246,14 @@ var WebLog_default = react_0_12_min_default.createClass({
     return this.renderContent(adminbutton, postbutton, morebutton);
   },
   renderContent(adminbutton, postbutton, morebutton) {
-    var entry = false;
+    var entry2 = false;
     if (arguments.length === 0) {
-      entry = this.getSlice()[0];
-      if (!entry) {
+      entry2 = this.getSlice()[0];
+      if (!entry2) {
         return false;
       }
-      var title = utils_default.titleReplace(entry.metadata.title);
-      var vanityURL = ["/", entry.metadata.created, "/", title].join("");
+      var title = utils_default.titleReplace(entry2.metadata.title);
+      var vanityURL = ["/", entry2.metadata.created, "/", title].join("");
       history.replaceState({}, title, vanityURL);
     }
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { ref: "weblog", className: "gh-weblog" }, /* @__PURE__ */ react_0_12_min_default.createElement(
@@ -9399,32 +9264,31 @@ var WebLog_default = react_0_12_min_default.createClass({
         onClose: this.bindSettings,
         onLogout: this.onLogOut
       }
-    ), adminbutton, postbutton, this.generateEntries(entry ? [entry] : false), morebutton);
+    ), adminbutton, postbutton, this.generateEntries(entry2 ? [entry2] : false), morebutton);
   },
   generateEntries(entries) {
     entries = entries || this.getSlice();
-    var self = this;
-    return entries.map(function(entry) {
+    return entries.map((entry2) => {
       return /* @__PURE__ */ react_0_12_min_default.createElement(
         Entry_default,
         {
-          key: entry.metadata.created,
-          ref: entry.metadata.id,
-          issues: self.state.issues,
-          metadata: entry.metadata,
-          postdata: entry.postdata,
-          editable: !self.state.singleton && self.state.authenticated,
-          runProcessors: self.runProcessors,
-          onSave: self.save,
-          onDelete: self.delete
+          key: entry2.metadata.created,
+          ref: entry2.metadata.id,
+          issues: this.state.issues,
+          metadata: entry2.metadata,
+          postdata: entry2.postdata,
+          editable: !this.state.singleton && this.state.authenticated,
+          runProcessors: this.runProcessors,
+          onSave: this.save,
+          onDelete: this.delete
         }
       );
     });
   },
-  runProcessors(domnode) {
+  runProcessors(domNode) {
     if (this.props.processors && this.props.processors instanceof Array) {
       this.props.processors.forEach(function(process) {
-        process(domnode);
+        process(domNode);
       });
     }
   },
@@ -9518,66 +9382,85 @@ var WebLog_default = react_0_12_min_default.createClass({
       tags: []
     };
     var postdata = "...click here to start editing your post...";
-    var id2 = this.timeToId(timestamp);
+    var id2 = timeToId(timestamp);
     this.setEntry(id2, metadata, postdata);
   },
-  save(entry) {
-    var self = this;
-    this.setEntry(entry.state.id, entry.getMetaData(), entry.postdata);
-    this.connector.saveEntry(entry, this.index, /* @__PURE__ */ __name(function saved() {
+  save(entry2) {
+    this.setEntry(entry2.state.id, entry2.getMetaData(), entry2.postdata);
+    this.saveRSS();
+    this.connector.saveEntry(entry2, this.index, () => {
       console.log("save handled");
-      self.saveRSS();
-    }, "saved"));
+    });
   },
-  delete(entry) {
+  delete(entry2) {
     var confirmed = confirm("really delete post?");
     if (confirmed) {
-      var self = this;
-      var id2 = entry.state.id;
+      var id2 = entry2.state.id;
       var pos = this.index.indexOf(id2);
       this.index.splice(pos, 1);
       delete this.list[id2];
       this.setState({ entries: this.list });
-      this.connector.deleteEntry(entry, this.index, /* @__PURE__ */ __name(function deleted() {
+      this.connector.deleteEntry(entry2, this.index, () => {
         console.log("delete handled");
-        self.saveRSS();
-      }, "deleted"));
+        this.saveRSS();
+      });
     }
   },
   saveRSS() {
-    var self = this;
     var connector = this.connector;
-    console.log("Updating RSS...");
-    connector.saveRSS(self.toRSS(), function() {
-      console.log("updated.");
-      if (self.props.rssfeeds) {
-        console.log("Updating category-specific RSS...");
-        var feeds = self.props.rssfeeds.split(",").map(function(v) {
-          return v.trim();
-        }).filter(function(v) {
-          return !!v;
-        });
-        (/* @__PURE__ */ __name(function nextCategory() {
-          if (feeds.length === 0) return console.log("All RSS feeds updated");
+    console.log(`Updating RSS...`);
+    connector.saveRSS(this.toRSS(), () => {
+      console.log(`updated.`);
+      if (this.props.rssfeeds) {
+        console.log(`Updating category-specific RSS...`);
+        const feeds = this.props.rssfeeds.split(",").map((v) => v.trim()).filter((v) => !!v);
+        (/* @__PURE__ */ __name(function nextCategory(self) {
+          if (feeds.length === 0) return console.log(`All RSS feeds updated`);
           var category = feeds.splice(0, 1)[0];
-          console.log("Updating category " + category);
+          console.log(`Updating category ${category}`);
           connector.saveRSS(
             self.toRSS(category),
             category.toLowerCase(),
             nextCategory
           );
-        }, "nextCategory"))();
+        }, "nextCategory"))(this);
       }
     });
+  },
+  toRSS(category) {
+    if (this.state.singleton) return;
+    if (this.state.slice.start >= 10) return;
+    const { base } = this.props;
+    var rssHeading = `<?xml version="1.0" encoding="UTF-8" ?>
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <atom:link href="${base}/${this.props.path}/rss.xml" rel="self" type="application/rss+xml" />
+      <title>${this.props.title}</title>
+      <description>${this.props.description}${category ? ` [${category} posts only]` : ``}</description>
+      <link>${base}</link>
+      <lastBuildDate>${(/* @__PURE__ */ new Date()).toUTCString()}</lastBuildDate>
+      <pubDate>${(/* @__PURE__ */ new Date()).toUTCString()}</pubDate>
+      <ttl>1440</ttl>
+  `;
+    var entryIds = Object.keys(this.list).sort().reverse().slice(0, 10);
+    var entriesRSS = entryIds.map((id2) => this.refs[id2].toRSS(base, category)).filter((v) => !!v).join("\n");
+    var rssTail = `
+    </channel>
+  </rss>
+  `;
+    var rss = rssHeading + entriesRSS + rssTail;
+    console.log(rss);
+    return rss;
   }
 });
 
 // components/App.jsx
-var settings = globalThis.WebLogSettings;
+var settings = weblogsettings_default.getSettings();
 var id = settings.target || "gh-weblog";
 var target = document.getElementById(id);
 if (!target) {
-  const msg = "no target element with id '" + id + "' found to inject gh-weblog into.";
+  const msg = `no target element with id '${id}' found to inject gh-weblog into.`;
   console.error(msg);
+} else {
+  react_0_12_min_default.render(react_0_12_min_default.createElement(WebLog_default, settings), target);
 }
-react_0_12_min_default.render(react_0_12_min_default.createElement(WebLog_default, settings), target);

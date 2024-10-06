@@ -3,14 +3,11 @@ import utils from "../lib/utils.js";
 import Admin from "./Admin.jsx";
 import Entry from "./Entry.jsx";
 
-import connector from "../mixins/connector";
-import timeToId from "../mixins/timetoid";
-import rssGenerator from "../mixins/rssgenerator";
-import webLogSettings from "../mixins/weblogsettings";
+import WebLogSettings from "../lib/weblogsettings.js";
+import Connector from "../lib/connector.js";
+import timeToId from "../lib/timetoid.js";
 
 export default React.createClass({
-  mixins: [connector, timeToId, rssGenerator, webLogSettings],
-
   // local cache, because we don't want to load the entire
   // index at once, and we don't want to requery for it.
   index: [],
@@ -32,10 +29,9 @@ export default React.createClass({
   },
 
   componentDidMount() {
-    // are we authenticataed?
-    var settings = this.getSettings();
+    const settings = WebLogSettings.getSettings();
     if (settings) {
-      this.connector = new this.Connector(settings);
+      this.connector = new Connector(settings);
       if (settings.token) {
         this.setState({ authenticated: true });
       }
@@ -52,7 +48,7 @@ export default React.createClass({
         fragmentId = false;
       }
     }
-    var id = this.timeToId(fragmentId);
+    var id = timeToId(fragmentId);
     if (id) {
       this.setState({ singleton: true });
     }
@@ -126,28 +122,27 @@ export default React.createClass({
 
   generateEntries(entries) {
     entries = entries || this.getSlice();
-    var self = this;
-    return entries.map(function (entry) {
+    return entries.map((entry) => {
       return (
         <Entry
           key={entry.metadata.created}
           ref={entry.metadata.id}
-          issues={self.state.issues}
+          issues={this.state.issues}
           metadata={entry.metadata}
           postdata={entry.postdata}
-          editable={!self.state.singleton && self.state.authenticated}
-          runProcessors={self.runProcessors}
-          onSave={self.save}
-          onDelete={self.delete}
+          editable={!this.state.singleton && this.state.authenticated}
+          runProcessors={this.runProcessors}
+          onSave={this.save}
+          onDelete={this.delete}
         />
       );
     });
   },
 
-  runProcessors(domnode) {
+  runProcessors(domNode) {
     if (this.props.processors && this.props.processors instanceof Array) {
       this.props.processors.forEach(function (process) {
-        process(domnode);
+        process(domNode);
       });
     }
   },
@@ -252,23 +247,21 @@ export default React.createClass({
       tags: [],
     };
     var postdata = "...click here to start editing your post...";
-    var id = this.timeToId(timestamp);
+    var id = timeToId(timestamp);
     this.setEntry(id, metadata, postdata);
   },
 
   save(entry) {
-    var self = this;
     this.setEntry(entry.state.id, entry.getMetaData(), entry.postdata);
-    this.connector.saveEntry(entry, this.index, function saved() {
+    this.saveRSS();
+    this.connector.saveEntry(entry, this.index, () => {
       console.log("save handled");
-      self.saveRSS();
     });
   },
 
   delete(entry) {
     var confirmed = confirm("really delete post?");
     if (confirmed) {
-      var self = this;
       var id = entry.state.id;
       // remove from index:
       var pos = this.index.indexOf(id);
@@ -276,40 +269,85 @@ export default React.createClass({
       // remove from list of loaded entries:
       delete this.list[id];
       this.setState({ entries: this.list });
-      this.connector.deleteEntry(entry, this.index, function deleted() {
+      this.connector.deleteEntry(entry, this.index, () => {
         console.log("delete handled");
-        self.saveRSS();
+        this.saveRSS();
       });
     }
   },
 
   saveRSS() {
-    var self = this;
     var connector = this.connector;
-    console.log("Updating RSS...");
-    connector.saveRSS(self.toRSS(), function () {
-      console.log("updated.");
-      if (self.props.rssfeeds) {
-        console.log("Updating category-specific RSS...");
-        var feeds = self.props.rssfeeds
+    console.log(`Updating RSS...`);
+    connector.saveRSS(this.toRSS(), () => {
+      console.log(`updated.`);
+      if (this.props.rssfeeds) {
+        console.log(`Updating category-specific RSS...`);
+        const feeds = this.props.rssfeeds
           .split(",")
-          .map(function (v) {
-            return v.trim();
-          })
-          .filter(function (v) {
-            return !!v;
-          });
-        (function nextCategory() {
-          if (feeds.length === 0) return console.log("All RSS feeds updated");
+          .map((v) => v.trim())
+          .filter((v) => !!v);
+
+        (function nextCategory(self) {
+          if (feeds.length === 0) return console.log(`All RSS feeds updated`);
           var category = feeds.splice(0, 1)[0];
-          console.log("Updating category " + category);
+          console.log(`Updating category ${category}`);
           connector.saveRSS(
             self.toRSS(category),
             category.toLowerCase(),
             nextCategory
           );
-        })();
+        })(this);
       }
     });
+  },
+
+  toRSS(category) {
+    // Don't update RSS if we're looking at a single entry.
+    // We shouldn't even get to this function, really.
+    if (this.state.singleton) return;
+
+    // Don't update if there was a change to out-of-RSS content,
+    // because those changes won't make it into the RSS feed anyway.
+    if (this.state.slice.start >= 10) return;
+
+    const { base } = this.props;
+
+    // Boilerplate RSS 2.0 header
+    var rssHeading = `<?xml version="1.0" encoding="UTF-8" ?>
+  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+    <channel>
+      <atom:link href="${base}/${
+      this.props.path
+    }/rss.xml" rel="self" type="application/rss+xml" />
+      <title>${this.props.title}</title>
+      <description>${this.props.description}${
+      category ? ` [${category} posts only]` : ``
+    }</description>
+      <link>${base}</link>
+      <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+      <pubDate>${new Date().toUTCString()}</pubDate>
+      <ttl>1440</ttl>
+  `;
+
+    // generate the RSS for the latest 10 entries only.
+    var entryIds = Object.keys(this.list).sort().reverse().slice(0, 10);
+    var entriesRSS = entryIds
+      .map((id) => this.refs[id].toRSS(base, category))
+      .filter((v) => !!v)
+      .join("\n");
+
+    // Boilerplate tail bit for the RSS feed
+    var rssTail = `
+    </channel>
+  </rss>
+  `;
+
+    // concatenated
+    var rss = rssHeading + entriesRSS + rssTail;
+    console.log(rss);
+
+    // we're done here.
+    return rss;
   },
 });

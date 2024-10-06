@@ -1,4 +1,4 @@
-Dev instance for http://pomax.github.io
+Dev instance for https://pomax.github.io
 =======
 
-live link: http://pomax.github.io/gh-blog
+live link: https://pomax.github.io/gh-webblog

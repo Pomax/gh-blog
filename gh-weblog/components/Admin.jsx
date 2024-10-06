@@ -1,32 +1,35 @@
 import React from "../lib/vendor/react/react.0.12.min.js";
-import webLogSettings from "../mixins/weblogsettings.js";
+import WebLogSettings from "../lib/weblogsettings.js";
+
+function stopPropagation(evt) {
+  evt.stopPropagation();
+  evt.preventDefault();
+}
 
 export default React.createClass({
-  mixins: [webLogSettings],
-
   getInitialState() {
     return {
       hidden: true,
-      user: "",
-      repo: "",
-      branch: "",
-      path: "gh-weblog",
-      token: "",
+      user: ``,
+      repo: ``,
+      branch: ``,
+      path: `gh-weblog`,
+      token: ``,
     };
   },
 
   componentDidMount() {
-    var obj = this.getSettings();
-    if (obj) {
-      obj.hidden = this.props.hidden;
-      this.setState(obj);
+    const settings = WebLogSettings.getSettings();
+    if (settings) {
+      settings.hidden = this.props.hidden;
+      this.setState(settings);
     }
   },
 
   render() {
     return (
       <div className="underlay" hidden={this.state.hidden} onClick={this.close}>
-        <div className="overlay" onClick={this.stopPropagation}>
+        <div className="overlay" onClick={stopPropagation}>
           <button className="logout" onClick={this.reset}>
             Log out
           </button>
@@ -39,7 +42,7 @@ export default React.createClass({
                   type="text"
                   placeholder="yourname"
                   value={this.state.user}
-                  onChange={this.changeUser}
+                  onChange={(evt) => this.update(`user`, evt)}
                 />
               </td>
             </tr>
@@ -50,7 +53,7 @@ export default React.createClass({
                   type="text"
                   placeholder="yourname.github.io"
                   value={this.state.repo}
-                  onChange={this.changeRepo}
+                  onChange={(evt) => this.update(`repo`, evt)}
                 />
               </td>
             </tr>
@@ -61,7 +64,7 @@ export default React.createClass({
                   type="text"
                   placeholder="master"
                   value={this.state.branch}
-                  onChange={this.changeBranch}
+                  onChange={(evt) => this.update(`branch`, evt)}
                 />
               </td>
             </tr>
@@ -71,7 +74,7 @@ export default React.createClass({
                 <input
                   type="text"
                   value={this.state.path}
-                  onChange={this.changePath}
+                  onChange={(evt) => this.update(`path`, evt)}
                 />
               </td>
             </tr>
@@ -86,10 +89,10 @@ export default React.createClass({
             type="text"
             className="token"
             value={this.state.token}
-            onChange={this.changeToken}
+            onChange={(evt) => this.update(`token`, evt)}
           />
           <p>
-            Don&#39;t give this token more permissions than necessary! gh-weblog
+            Don't give this token more permissions than necessary! gh-weblog
             only needs repo access!
           </p>
         </div>
@@ -98,15 +101,8 @@ export default React.createClass({
   },
 
   reset() {
-    this.clearSettings();
-    this.setState({
-      user: "",
-      repo: "",
-      branch: "",
-      path: "gh-weblog",
-      token: "",
-      hidden: true,
-    });
+    WebLogSettings.clearSettings();
+    this.setState(this.getInitialState());
     this.props.onLogout();
   },
 
@@ -115,42 +111,14 @@ export default React.createClass({
   },
 
   close() {
-    this.setState({ hidden: true });
-    this.props.onClose({
-      user: this.state.user,
-      repo: this.state.repo,
-      branch: this.state.branch,
-      path: this.state.path,
-      token: this.state.token,
-    });
+    this.setState({ hidden: true }, () => this.props.onClose(this.state));
   },
 
-  stopPropagation(evt) {
-    evt.stopPropagation();
-    evt.preventDefault();
+  update(propName, evt) {
+    this.setState({ [propName]: evt.target.value }, this.updateSettings);
   },
 
-  changeUser(evt) {
-    this.setState({ user: evt.target.value }, this.update);
-  },
-
-  changeRepo(evt) {
-    this.setState({ repo: evt.target.value }, this.update);
-  },
-
-  changeBranch(evt) {
-    this.setState({ branch: evt.target.value }, this.update);
-  },
-
-  changePath(evt) {
-    this.setState({ path: evt.target.value }, this.update);
-  },
-
-  changeToken(evt) {
-    this.setState({ token: evt.target.value }, this.update);
-  },
-
-  update() {
-    this.saveSettings(this.state);
+  updateSetting() {
+    WebLogSettings.saveSettings(this.state);
   },
 });
