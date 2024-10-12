@@ -1,6 +1,4 @@
-import { Octokit as OctokitCore } from "@octokit/core";
-import { createOrUpdateTextFile } from "@octokit/plugin-create-or-update-text-file";
-const Octokit = OctokitCore.plugin(createOrUpdateTextFile);
+import { Octokit } from "@octokit/rest";
 
 export default class Connector {
   constructor(options) {
