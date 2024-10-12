@@ -1,4 +1,3 @@
-// import Octokit from "../lib/vendor/octokit/octokit.js";
 import { Octokit } from "@octokit/core";
 
 export default class Connector {
@@ -16,7 +15,6 @@ export default class Connector {
 
   setProperties(options) {
     this.path = options.path;
-    console.log(`this.path =`, this.path);
     this.octokit = new Octokit({ auth: options.token });
   }
 

@@ -8496,7 +8496,6 @@ var Connector = class {
   }
   setProperties(options2) {
     this.path = options2.path;
-    console.log(`this.path =`, this.path);
     this.octokit = new Octokit({ auth: options2.token });
   }
   async get(url) {
