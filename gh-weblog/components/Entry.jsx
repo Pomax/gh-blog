@@ -20,7 +20,9 @@ export default createClass({
 
   onMount() {
     const { metaData, postData } = this.props;
-    this.setState({ ...metaData, postData });
+    const update = { ...metaData, postData };
+    console.log(`update:`, update);
+    this.setState(update);
     const root = document.querySelector(`:root`);
     root.addEventListener(`click`, (evt) => {
       if (evt.target !== root) return;

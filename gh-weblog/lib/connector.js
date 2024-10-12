@@ -1,4 +1,6 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit as OctokitCore } from "@octokit/core";
+import { createOrUpdateTextFile } from "@octokit/plugin-create-or-update-text-file";
+const Octokit = OctokitCore.plugin(createOrUpdateTextFile);
 
 export default class Connector {
   constructor(options) {
@@ -42,9 +44,10 @@ export default class Connector {
   // -----------------------------------------------------------
 
   async getCurrentSha() {
-    const { octokit, user, repo, branch, path } = options;
+    const { octokit, options } = this;
+    const { user, repo, branch } = options;
     return (
-      await octokit.request(`GET /repos/${user}/${repo}commits/${branch}`)
+      await octokit.request(`GET /repos/${user}/${repo}/commits/${branch}`)
     ).data.sha;
   }
 
@@ -61,48 +64,85 @@ export default class Connector {
 
   async saveEntry({ id, metaData, postData }, index, saved) {
     const { options, octokit } = this;
-    const { user, repo, branch } = options;
+    const { user: owner, repo, branch } = options;
     const path = `${this.path}/content/posts/`;
-    const commitMessage = `Saving new entry ${id}`;
+    const message = `Saving new entry ${id}`;
     const content = {};
 
+    // Prepare our "files"
+
+    console.log(`index`, index);
     const indexData = JSON.stringify(index, false, 2);
     const indexFilename = `${path}index.json`;
-    content[indexFilename] = await this.makeBlob(indexData);
+    content[indexFilename] = (
+      await this.octokit.git.createBlob({
+        owner,
+        repo,
+        content: indexData,
+        encoding: "utf-8",
+      })
+    ).data;
 
+    console.log(`metadata`, metaData);
     metaData = JSON.stringify(metaData, false, 2);
     const metaDataFilename = `${path}metadata/${id}.json`;
-    content[metaDataFilename] = await this.makeBlob(metaData);
+    content[metaDataFilename] = (
+      await this.octokit.git.createBlob({
+        owner,
+        repo,
+        content: metaData,
+        encoding: "utf-8",
+      })
+    ).data;
 
+    console.log(`postdata`, postData);
     const postDataFilename = `${path}markdown/${id}.md`;
-    content[postDataFilename] = await this.makeBlob(postData);
+    content[postDataFilename] = (
+      await this.octokit.git.createBlob({
+        owner,
+        repo,
+        content: postData,
+        encoding: "utf-8",
+      })
+    ).data;
 
+    // Then prepare a tree that we'll push up
+    console.log(`forming path/blob tree association`);
     const paths = Object.keys(content);
     const blobs = Object.values(content);
-    const currentSha = this.getCurrentSha();
+    const tree = blobs.map(({ sha }, index) => ({
+      path: paths[index],
+      mode: `100644`,
+      type: `blob`,
+      sha,
+    }));
 
-    const { data: newTree } = await octokit.git.createTree({
-      owner: user,
-      repo,
-      tree: blobs.map(({ sha }, index) => ({
-        path: paths[index],
-        mode: `100644`,
-        type: `blob`,
-        sha,
-      })),
-      base_tree: currentSha,
-    });
+    // Create the tree and get its sha
+    const currentSha = await this.getCurrentSha();
+    console.log(`create tree, currentSha is ${currentSha}`);
+    const treeSha = (
+      await octokit.git.createTree({
+        owner,
+        repo,
+        tree,
+        base_tree: currentSha,
+      })
+    ).data.sha;
 
-    const { data: newCommit } = await octokit.git.createCommit({
-      owner: user,
-      repo,
-      message: commitMessage,
-      tree: newTree.sha,
-      parents: [currentSha],
-    });
+    // Create a commit and get its sha
+    const newCommit = (
+      await octokit.git.createCommit({
+        owner,
+        repo,
+        message,
+        tree: treeSha,
+        parents: [currentSha],
+      })
+    ).data;
 
+    // Update the branch ref
     octokit.git.updateRef({
-      owner: user,
+      owner,
       repo,
       ref: `heads/${branch}`,
       sha: newCommit.sha,

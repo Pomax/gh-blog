@@ -151,7 +151,8 @@ export default createClass({
     return entries.map((entry) => {
       return entry.metaData.draft && !authenticated ? null : (
         <Entry
-          key={entry.metaData.created}
+          key={entry.metaData.id}
+          id={entry.metaData.id}
           ref={entry.metaData.id}
           issues={issues}
           metaData={entry.metaData}
@@ -226,6 +227,7 @@ export default createClass({
   },
 
   createEntry() {
+    console.log(`create entry!`);
     const date = new Date();
     const timestamp = date.getTime();
     const metaData = {
@@ -237,23 +239,27 @@ export default createClass({
       draft: undefined,
     };
     const postData = "...click here to start editing your post...";
-    const id = timeToId(timestamp);
+    const id = (metaData.id = timeToId(timestamp));
+    console.log(`created:`, { id, metaData, postData });
     this.updateEntry(id, metaData, postData);
   },
 
   updateEntry(id, metaData, postData) {
     const { entries, index } = this.state;
     entries[id] = { metaData, postData };
+    const entryIds = Object.keys(entries).sort().reverse();
     const { title, published, category, draft } = metaData;
     index[id] = { title, published, category, draft };
-    this.setState({ entries, index });
+    return new Promise((resolve) =>
+      this.setState({ entryIds, entries, index }, resolve)
+    );
   },
 
-  saveEntry(entry) {
-    const id = entry.state.id;
+  async saveEntry(entry) {
     const metaData = entry.getMetaData();
-    const postData = entry.postData;
-    this.updateEntry(id, metaData, postData);
+    const id = metaData.id;
+    const postData = entry.getPostData();
+    await this.updateEntry(id, metaData, postData);
     this.connector.saveEntry(
       { id, metaData, postData },
       this.state.index,

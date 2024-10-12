@@ -115,10 +115,13 @@ export default React.createClass({
   },
 
   update(propName, evt) {
-    this.setState({ [propName]: evt.target.value }, this.updateSettings);
+    this.setState({ [propName]: evt.target.value }, () => {
+      this.updateSettings();
+    });
   },
 
-  updateSetting() {
-    WebLogSettings.saveSettings(this.state);
+  updateSettings() {
+    const { hidden, ...settings } = this.state;
+    WebLogSettings.saveSettings(settings);
   },
 });

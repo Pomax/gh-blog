@@ -21,6 +21,7 @@
     "express": "^4.21.0"
   },
   "dependencies": {
-    "@octokit/core": "^6.1.2"
+    "@octokit/core": "^6.1.2",
+    "@octokit/plugin-create-or-update-text-file": "^5.1.0"
   }
 }
