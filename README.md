@@ -1,4 +1,3 @@
-Dev instance for https://pomax.github.io
-=======
+Test repo
 
-live link: https://pomax.github.io/gh-webblog
+https://pomax.github.io/blog-test-repo
