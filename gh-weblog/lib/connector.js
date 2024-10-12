@@ -1,4 +1,4 @@
-import { Octokit } from "@octokit/core";
+import { Octokit } from "@octokit/rest";
 
 export default class Connector {
   constructor(options) {
