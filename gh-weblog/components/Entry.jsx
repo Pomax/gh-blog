@@ -1,27 +1,26 @@
-import React from "../lib/vendor/react/react.0.12.min.js";
+import { React, createClass } from "../lib/create-component.js";
 import utils from "../lib/utils.js";
 import MarkDown from "./MarkDown.jsx";
 import Editor from "./Editor.jsx";
 import Tags from "./Tags.jsx";
 
-export default React.createClass({
-  getInitialState() {
-    return {
-      id: -1,
-      title: "",
-      created: Date.now(),
-      published: Date.now(),
-      updated: Date.now(),
-      tags: [],
-      editing: false,
-      postdata: "",
-    };
+// TODO: add a category field
+
+export default createClass({
+  initialState: {
+    id: -1,
+    title: "",
+    created: Date.now(),
+    published: Date.now(),
+    updated: Date.now(),
+    tags: [],
+    editing: false,
+    postData: "",
   },
 
-  componentDidMount() {
-    const { metadata, postdata } = this.props;
-    metadata.postdata = postdata;
-    this.setState(metadata);
+  onMount() {
+    const { metaData, postData } = this.props;
+    this.setState({ ...metaData, postData });
     const root = document.querySelector(`:root`);
     root.addEventListener(`click`, (evt) => {
       if (evt.target !== root) return;
@@ -30,23 +29,24 @@ export default React.createClass({
   },
 
   render() {
-    const title = utils.titleReplace(this.state.title);
+    const { props, state } = this;
+    const title = utils.titleReplace(state.title);
     let deleteButton;
-    if (this.props.editable) {
+    if (props.editable) {
       deleteButton = (
         <button className="admin delete button" onClick={this.delete}>
           remove entry
         </button>
       );
     }
-    const posted = new Date(this.state.published).toLocaleString();
-    const updated = new Date(this.state.updated).toLocaleString();
+    const posted = new Date(state.published).toLocaleString();
+    const updated = new Date(state.updated).toLocaleString();
     return (
-      <div className="entry" id={`gh-weblog-${this.state.created}`}>
+      <div className="entry" id={`gh-weblog-${state.created}`}>
         {deleteButton}
         <header>
           <h1>
-            <a href={`/${this.state.created}/${title}`}>{this.state.title}</a>
+            <a href={`/${state.created}/${title}`}>{state.title}</a>
           </h1>
           <h2>
             Originally posted on {posted}, last updated on {updated}
@@ -54,32 +54,28 @@ export default React.createClass({
         </header>
         <MarkDown
           ref="markdown"
-          hidden={this.state.editing}
-          text={this.state.postdata}
+          hidden={state.editing}
+          text={state.postData}
           onClick={this.edit}
         />
         <Editor
           ref="editor"
-          hidden={!this.state.editing}
+          hidden={!state.editing}
           text={this.getText()}
           update={this.update}
           view={this.view}
           delete={this.delete}
         />
-        <a className="comments" href={this.props.issues}>
+        <a className="comments" href={props.issues}>
           leave a comment on github
         </a>
         <Tags
-          disabled={!this.props.editable}
-          tags={this.state.tags}
+          disabled={!props.editable}
+          tags={state.tags}
           onChange={this.updateTags}
         />
       </div>
     );
-  },
-
-  componentDidUpdate() {
-    this.props.runProcessors(this.refs.markdown.getDOMNode());
   },
 
   updateTags(tags) {
@@ -87,18 +83,18 @@ export default React.createClass({
   },
 
   getText() {
-    return `#${this.state.title}\n\n${this.state.postdata}`;
+    return `#${this.state.title}\n\n${this.state.postData}`;
   },
 
   getMetaData() {
     const md = JSON.parse(JSON.stringify(this.state));
     delete md.editing;
-    delete md.postdata;
+    delete md.postData;
     return md;
   },
 
   getPostData() {
-    return this.state.postdata;
+    return this.state.postData;
   },
 
   getHTMLData() {
@@ -115,8 +111,8 @@ export default React.createClass({
   update(evt) {
     const lines = evt.target.value.split("\n");
     const title = lines.splice(0, 1)[0].replace(/^#*/, "");
-    const postdata = lines.join("\n").trim();
-    this.setState({ title, postdata, updated: Date.now() });
+    const postData = lines.join("\n").trim();
+    this.setState({ title, postData, updated: Date.now() });
   },
 
   view() {
@@ -146,7 +142,9 @@ export default React.createClass({
     <item>
       <title>${this.state.title}</title>
       <description>${safifier.innerHTML}</description>
-      ${this.state.tags.map((tag) => `<category>${tag}</category>`).join(`\n      `)}
+      ${this.state.tags
+        .map((tag) => `<category>${tag}</category>`)
+        .join(`\n      `)}
       <link>${base}/#gh-weblog-${this.state.published}</link>
       <guid>${base}/#gh-weblog-${this.state.published}</guid>
       <pubDate>${new Date(this.state.published).toUTCString()}</pubDate>

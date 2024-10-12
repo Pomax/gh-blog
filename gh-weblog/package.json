@@ -4,7 +4,7 @@
   "private": true,
   "type": "module",
   "scripts": {
-    "test": "rm -rf dist && esbuild ./components/App.jsx --bundle --platform=browser --format=esm --keep-names --tree-shaking=false --outfile=./dist/gh-weblog.js"
+    "test": "rm -rf dist && esbuild ./components/index.jsx --bundle --platform=browser --format=esm --keep-names --tree-shaking=false --outfile=./dist/gh-weblog.js --watch"
   },
   "repository": {
     "type": "git",

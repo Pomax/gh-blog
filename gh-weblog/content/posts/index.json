@@ -1,5 +1,7 @@
 {
-  "index": [
-    "2015-01-02-06-23-09"
-  ]
+  "2015-01-02-06-23-09": {
+    "title": "A Quickstart Guide",
+    "published": 1420179789753,
+    "category": "news"
+  }
 }

@@ -1,33 +1,26 @@
-<!doctype html>
+<!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <meta charset="utf-8" />
     <title>Github weblogging</title>
-    <link rel="stylesheet" href="style.css">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lustria">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Lato">
-    <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Eagle+Lake">
+    <link rel="stylesheet" href="style.css" />
+    <link rel="stylesheet" href="gh-weblog/style.css" />
+    <script src="gh-weblog/dist/gh-weblog.js" async defer></script>
   </head>
   <body>
-
     <header>
       <h1><a href=".">Github weblogging</a></h1>
-      <h2>With perhaps subtitle (Also available in <a href="gh-weblog/rss.xml">RSS</a> form)</h2>
+      <h2>
+        With perhaps a subtitle (Also available in
+        <a href="gh-weblog/rss.xml">RSS</a> form)
+      </h2>
     </header>
 
-    <!-- Github gh-pages weblog code: -->
-    <section id="gh-weblog"></section>
-    <link rel="stylesheet" href="gh-weblog/style.css">
-    <script>
-    var WebLogSettings = {
-      target:      "gh-weblog",
-      base:        "http://pomax.github.io/gh-blog",
-      title:       "Github Weblogging",
-      description: "A free, simple github powered blogging platform",
-    };
-    </script>
-    <script src='gh-weblog/dist/gh-weblog.js'></script>
-    <!-- End of Github gh-pages weblog code -->
-
+    <section
+      id="gh-weblog"
+      data-base="https://pomax.github.io/blog-test-repo/"
+      data-site="https://github.com/Pomax/gh-weblog"
+      data-description="A free, simple github-based blogging platform"
+    ></section>
   </body>
 </html>

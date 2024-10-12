@@ -6397,6 +6397,20 @@ var react_0_12_min_default = function() {
   )(1);
 }();
 
+// lib/create-component.js
+function createClass(spec) {
+  const { initialState = {} } = spec;
+  spec.getInitialState = () => initialState;
+  spec.onMount && (spec.componentDidMount = function(...args) {
+    this.onMount(...args);
+  });
+  spec.onUpdate && (spec.componentDidUpdate = function(...args) {
+    this.onUpdate(...args);
+  });
+  return react_0_12_min_default.createClass(spec);
+}
+__name(createClass, "createClass");
+
 // lib/utils.js
 var utils_default = {
   /**
@@ -6415,7 +6429,7 @@ var settingsName = `gh-weblog-settings-${loc}`;
 var WebLogSettings = {
   getSettings() {
     const settings2 = localStorage[settingsName];
-    if (!settings2) return;
+    if (!settings2) return {};
     return JSON.parse(settings2);
   },
   saveSettings(settings2) {
@@ -7375,23 +7389,20 @@ var Tags_default = react_0_12_min_default.createClass({
 });
 
 // components/Entry.jsx
-var Entry_default = react_0_12_min_default.createClass({
-  getInitialState() {
-    return {
-      id: -1,
-      title: "",
-      created: Date.now(),
-      published: Date.now(),
-      updated: Date.now(),
-      tags: [],
-      editing: false,
-      postdata: ""
-    };
+var Entry_default = createClass({
+  initialState: {
+    id: -1,
+    title: "",
+    created: Date.now(),
+    published: Date.now(),
+    updated: Date.now(),
+    tags: [],
+    editing: false,
+    postData: ""
   },
-  componentDidMount() {
-    const { metadata, postdata } = this.props;
-    metadata.postdata = postdata;
-    this.setState(metadata);
+  onMount() {
+    const { metaData, postData } = this.props;
+    this.setState({ ...metaData, postData });
     const root = document.querySelector(`:root`);
     root.addEventListener(`click`, (evt) => {
       if (evt.target !== root) return;
@@ -7399,42 +7410,40 @@ var Entry_default = react_0_12_min_default.createClass({
     });
   },
   render() {
-    const title = utils_default.titleReplace(this.state.title);
+    const { props, state } = this;
+    const title = utils_default.titleReplace(state.title);
     let deleteButton;
-    if (this.props.editable) {
+    if (props.editable) {
       deleteButton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin delete button", onClick: this.delete }, "remove entry");
     }
-    const posted = new Date(this.state.published).toLocaleString();
-    const updated = new Date(this.state.updated).toLocaleString();
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${this.state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `/${this.state.created}/${title}` }, this.state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
+    const posted = new Date(state.published).toLocaleString();
+    const updated = new Date(state.updated).toLocaleString();
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `/${state.created}/${title}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
       MarkDown_default,
       {
         ref: "markdown",
-        hidden: this.state.editing,
-        text: this.state.postdata,
+        hidden: state.editing,
+        text: state.postData,
         onClick: this.edit
       }
     ), /* @__PURE__ */ react_0_12_min_default.createElement(
       Editor_default,
       {
         ref: "editor",
-        hidden: !this.state.editing,
+        hidden: !state.editing,
         text: this.getText(),
         update: this.update,
         view: this.view,
         delete: this.delete
       }
-    ), /* @__PURE__ */ react_0_12_min_default.createElement("a", { className: "comments", href: this.props.issues }, "leave a comment on github"), /* @__PURE__ */ react_0_12_min_default.createElement(
+    ), /* @__PURE__ */ react_0_12_min_default.createElement("a", { className: "comments", href: props.issues }, "leave a comment on github"), /* @__PURE__ */ react_0_12_min_default.createElement(
       Tags_default,
       {
-        disabled: !this.props.editable,
-        tags: this.state.tags,
+        disabled: !props.editable,
+        tags: state.tags,
         onChange: this.updateTags
       }
     ));
-  },
-  componentDidUpdate() {
-    this.props.runProcessors(this.refs.markdown.getDOMNode());
   },
   updateTags(tags) {
     this.setState({ tags }, () => this.props.onSave(this));
@@ -7442,16 +7451,16 @@ var Entry_default = react_0_12_min_default.createClass({
   getText() {
     return `#${this.state.title}
 
-${this.state.postdata}`;
+${this.state.postData}`;
   },
   getMetaData() {
     const md = JSON.parse(JSON.stringify(this.state));
     delete md.editing;
-    delete md.postdata;
+    delete md.postData;
     return md;
   },
   getPostData() {
-    return this.state.postdata;
+    return this.state.postData;
   },
   getHTMLData() {
     return this.refs.markdown.getHTML();
@@ -7465,8 +7474,8 @@ ${this.state.postdata}`;
   update(evt) {
     const lines = evt.target.value.split("\n");
     const title = lines.splice(0, 1)[0].replace(/^#*/, "");
-    const postdata = lines.join("\n").trim();
-    this.setState({ title, postdata, updated: Date.now() });
+    const postData = lines.join("\n").trim();
+    this.setState({ title, postData, updated: Date.now() });
   },
   view() {
     if (this.state.editing) {
@@ -9020,110 +9029,42 @@ var Connector = class {
     );
     this.branch = this.repo.getBranch(options.branch);
   }
-  get(url, options, processData) {
-    if (options && !processData) {
-      processData = options;
-      options = {};
+  async get(url) {
+    const type = url.endsWith(`.json`) ? `json` : `text`;
+    const result = await fetch(`${url}?t=${Date.now()}`);
+    if (result.ok) {
+      return await result[type]();
     }
-    const xhr = new XMLHttpRequest();
-    xhr.open("GET", `${url}?t=${Date.now()}`, true);
-    Object.keys(options).forEach(function(key) {
-      xhr[key] = options[key];
-    });
-    xhr.onreadystatechange = function(evt) {
-      if (xhr.status === 0 || xhr.status === 200) {
-        if (xhr.readyState === 4) {
-          const obj = evt.target.response;
-          processData(!obj, obj);
-        }
-      } else {
-        processData(`xhr error ${xhr.status} for ${url}`);
-      }
-    };
-    xhr.onerror = processData;
-    xhr.send(null);
+    throw new Error(result.status);
   }
-  json(url, processData) {
-    this.get(url, function(err2, data) {
-      if (err2) {
-        return console.error(err2);
-      }
-      try {
-        processData(false, JSON.parse(data));
-      } catch (error) {
-        processData(error);
-      }
-    });
+  async loadIndex() {
+    return await this.get(`${this.options.path}/content/posts/index.json`);
   }
-  loadIndex(handleIndex, entryId) {
-    this.json(
-      `${this.options.path}/content/posts/index.json`,
-      function(err2, result) {
-        if (entryId) {
-          return handleIndex(err2, result ? [entryId] : false);
-        }
-        handleIndex(err2, result ? result.index.sort() : false);
-      }
-    );
+  async loadMetaData(id2) {
+    return this.get(`${this.options.path}/content/posts/metaData/${id2}.json`);
   }
-  loadMetadata(id2, handleMetadata) {
-    this.json(
-      `${this.options.path}/content/posts/metadata/${id2}.json`,
-      function(err2, result) {
-        handleMetadata(err2, result);
-      }
-    );
+  async loadPostData(id2) {
+    return this.get(`${this.options.path}/content/posts/markdown/${id2}.md`);
   }
-  loadEntry(id2, handleEntry) {
-    this.get(
-      `${this.options.path}/content/posts/markdown/${id2}.md`,
-      function(err2, result) {
-        handleEntry(err2, result);
-      }
-    );
-  }
-  saveEntry(entry2, index, saved) {
-    const id2 = entry2.state.id;
+  saveEntry({ id: id2, metaData, postData }, index, saved) {
     const path2 = `${this.options.path}/content/posts/`;
     const commitMessage = `Saving new entry ${id2}`;
     const content = {};
-    const indexdata = JSON.stringify({ index: index.sort() }, false, 2);
+    const indexData = JSON.stringify(index, false, 2);
     const indexFilename = `${path2}index.json`;
-    content[indexFilename] = indexdata;
-    const metadata = JSON.stringify(entry2.getMetaData(), false, 2);
-    const metadataFilename = `${path2}metadata/${id2}.json`;
-    content[metadataFilename] = metadata;
-    const postData = entry2.getpostData();
+    content[indexFilename] = indexData;
+    metaData = JSON.stringify(metaData, false, 2);
+    const metaDataFilename = `${path2}metaData/${id2}.json`;
+    content[metaDataFilename] = metaData;
     const postDataFilename = `${path2}markdown/${id2}.md`;
     content[postDataFilename] = postData;
     try {
       this.branch.writeMany(content, commitMessage).then(function() {
         console.log(`Saved entry ${id2} to github.`);
-        if (saved) saved(entry2);
+        if (saved) saved(entry);
       });
     } catch (e) {
       console.error(`saving went horribly wrong`);
-      throw e;
-    }
-  }
-  updateEntry(entry2, updated) {
-    const id2 = entry2.state.id;
-    const path2 = `${this.options.path}/content/posts/`;
-    const content = {};
-    const commitMessage = `Updating entry ${id2}`;
-    const metadata = JSON.stringify(entry2.getMetaData(), false, 2);
-    const metadataFilename = `${path2}metadata/${id2}.json`;
-    content[metadataFilename] = metadata;
-    const postData = entry2.getpostData();
-    const postDataFilename = `${path2}markdown/${id2}.md`;
-    content[postDataFilename] = postData;
-    try {
-      this.branch.writeMany(content, commitMessage).then(function() {
-        console.log(`Updated entry ${id2} on github.`);
-        if (updated) updated(entry2);
-      });
-    } catch (e) {
-      console.error(`updating went horribly wrong`);
       throw e;
     }
   }
@@ -9131,13 +9072,13 @@ var Connector = class {
     const id2 = entry2.state.id;
     const path2 = `${this.options.path}/content/posts/`;
     const commitMessage = `Removing entry ${id2}`;
-    const indexdata = JSON.stringify({ index: index.sort() }, false, 2);
+    const indexData = JSON.stringify({ index: index.sort() }, false, 2);
     const indexFilename = `${path2}index.json`;
-    const metadataFilename = `${path2}metadata/${id2}.json`;
+    const metaDataFilename = `${path2}metaData/${id2}.json`;
     const postDataFilename = `${path2}markdown/${id2}.md`;
     const branch = this.branch;
     try {
-      branch.write(indexFilename, indexdata, commitMessage).then(() => branch.remove(metadataFilename, commitMessage)).then(() => branch.remove(postDataFilename, commitMessage)).then(() => {
+      branch.write(indexFilename, indexData, commitMessage).then(() => branch.remove(metaDataFilename, commitMessage)).then(() => branch.remove(postDataFilename, commitMessage)).then(() => {
         console.log(`Removed entry ${id2} from github.`);
         if (deleted) deleted(entry2);
       });
@@ -9166,7 +9107,7 @@ var Connector = class {
   }
 };
 
-// lib/timetoid.js
+// components/WebLog.jsx
 function timeToId(timestamp) {
   if (!timestamp) return false;
   var d = new Date(parseInt(timestamp, 10));
@@ -9175,65 +9116,69 @@ function timeToId(timestamp) {
   return id2;
 }
 __name(timeToId, "timeToId");
-
-// components/WebLog.jsx
-var WebLog_default = react_0_12_min_default.createClass({
+var WebLog_default = createClass({
   // local cache, because we don't want to load the entire
   // index at once, and we don't want to requery for it.
   index: [],
   // local cache, because we can't be sure state won't
   // be modified multiple times per time slice.
   list: {},
-  getInitialState() {
-    return {
-      singleton: false,
-      entries: this.list,
-      slice: { start: 0, end: 10 },
-      githubissues: "",
-      authenticated: false,
-      site: "",
-      issues: ""
-    };
+  initialState: {
+    singleton: false,
+    entries: {},
+    entryIds: [],
+    index: {},
+    slice: { start: 0, end: 10 },
+    authenticated: false,
+    site: ``,
+    issues: ``,
+    categories: void 0
   },
-  componentDidMount() {
-    const settings2 = weblogsettings_default.getSettings();
-    if (settings2) {
-      this.connector = new Connector(settings2);
-      if (settings2.token) {
-        this.setState({ authenticated: true });
-      }
-    } else {
-      this.connector = new this.Connector();
-    }
-    var fragmentId = location.hash || false;
+  getPostId() {
+    let fragmentId = location.hash || false;
     if (fragmentId) {
-      if (fragmentId.indexOf("#gh-weblog") > -1) {
-        fragmentId = fragmentId.replace("#gh-weblog-", "");
+      if (fragmentId.indexOf(`#gh-weblog`) > -1) {
+        fragmentId = fragmentId.replace(`#gh-weblog-`, ``);
       } else {
         fragmentId = false;
       }
     }
-    var id2 = timeToId(fragmentId);
+    const id2 = timeToId(fragmentId);
     if (id2) {
       this.setState({ singleton: true });
     }
-    this.connector.loadIndex(this.loadIndex, id2);
-    var a = document.createElement("a");
-    a.href = this.props.base;
-    var user = a.host.replace(".github.io", "");
-    var path2 = a.pathname.replace(/^\//, "").trim().split("/")[0];
-    var repo = path2 ? path2 : a.host;
-    this.setState({
-      site: "http://github.com/" + user + "/" + repo,
-      issues: "http://github.com/" + user + "/" + repo + "/issues"
-    });
+    return id2;
+  },
+  setIssueTracker() {
+    const site = document.getElementById(`gh-weblog`).dataset.site;
+    this.setState({ site, issues: `${site}/issues` });
+  },
+  async onMount() {
+    this.loadSettings();
+    const id2 = this.getPostId();
+    const index = await this.connector.loadIndex();
+    const categories = /* @__PURE__ */ new Set();
+    Object.values(index).forEach((e) => categories.add(e.category));
+    this.setState(
+      {
+        index,
+        categories: [...categories],
+        entryIds: Object.keys(index).sort().reverse()
+      },
+      () => {
+        this.props.onCategories?.(this.state.categories);
+        this.loadEntries(id2);
+        this.setIssueTracker();
+      }
+    );
   },
   render() {
-    if (!!this.state.singleton) {
+    const { state } = this;
+    if (!!state.singleton) {
       return this.renderContent();
     }
-    var postbutton = this.state.authenticated ? /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin post button", onClick: this.create }, "new entry") : false;
-    var adminbutton = /* @__PURE__ */ react_0_12_min_default.createElement(
+    var postButton = state.authenticated ? /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin post button", onClick: this.createEntry }, "new entry") : false;
+    var adminButton = /* @__PURE__ */ react_0_12_min_default.createElement(
       "button",
       {
         className: "authenticate",
@@ -9242,18 +9187,18 @@ var WebLog_default = react_0_12_min_default.createClass({
       },
       "admin"
     );
-    var morebutton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { onClick: this.more }, "Load more posts");
-    return this.renderContent(adminbutton, postbutton, morebutton);
+    var moreButton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { onClick: this.more }, "Load more posts");
+    return this.renderContent(adminButton, postButton, moreButton);
   },
-  renderContent(adminbutton, postbutton, morebutton) {
+  renderContent(adminButton, postButton, moreButton) {
     var entry2 = false;
     if (arguments.length === 0) {
       entry2 = this.getSlice()[0];
       if (!entry2) {
         return false;
       }
-      var title = utils_default.titleReplace(entry2.metadata.title);
-      var vanityURL = ["/", entry2.metadata.created, "/", title].join("");
+      var title = utils_default.titleReplace(entry2.metaData.title);
+      var vanityURL = ["/", entry2.metaData.created, "/", title].join("");
       history.replaceState({}, title, vanityURL);
     }
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { ref: "weblog", className: "gh-weblog" }, /* @__PURE__ */ react_0_12_min_default.createElement(
@@ -9264,32 +9209,41 @@ var WebLog_default = react_0_12_min_default.createClass({
         onClose: this.bindSettings,
         onLogout: this.onLogOut
       }
-    ), adminbutton, postbutton, this.generateEntries(entry2 ? [entry2] : false), morebutton);
+    ), adminButton, postButton, this.generateEntries(entry2 ? [entry2] : false), moreButton);
+  },
+  getSlice() {
+    const { state } = this;
+    var start = state.slice.start;
+    var end = state.slice.end;
+    var ids = state.entryIds.slice(start, end);
+    return ids.map((id2) => state.entries[id2]).filter(Boolean);
   },
   generateEntries(entries) {
     entries = entries || this.getSlice();
+    if (!entries.length) return;
+    const { issues, singleton, authenticated } = this.state;
     return entries.map((entry2) => {
-      return /* @__PURE__ */ react_0_12_min_default.createElement(
+      return entry2.metaData.draft && !authenticated ? null : /* @__PURE__ */ react_0_12_min_default.createElement(
         Entry_default,
         {
-          key: entry2.metadata.created,
-          ref: entry2.metadata.id,
-          issues: this.state.issues,
-          metadata: entry2.metadata,
-          postdata: entry2.postdata,
-          editable: !this.state.singleton && this.state.authenticated,
-          runProcessors: this.runProcessors,
-          onSave: this.save,
-          onDelete: this.delete
+          key: entry2.metaData.created,
+          ref: entry2.metaData.id,
+          issues,
+          metaData: entry2.metaData,
+          postData: entry2.postData,
+          editable: !singleton && authenticated,
+          onSave: this.saveEntry,
+          onDelete: this.deleteEntry
         }
       );
     });
   },
-  runProcessors(domNode) {
-    if (this.props.processors && this.props.processors instanceof Array) {
-      this.props.processors.forEach(function(process) {
-        process(domNode);
-      });
+  // ------------------------------------------------------------
+  loadSettings() {
+    const settings2 = weblogsettings_default.getSettings();
+    this.connector = new Connector(settings2);
+    if (settings2 && settings2.token) {
+      this.setState({ authenticated: true });
     }
   },
   showSettings() {
@@ -9301,6 +9255,7 @@ var WebLog_default = react_0_12_min_default.createClass({
       this.setState({ authenticated: true });
     }
   },
+  // ------------------------------------------------------------
   onLogOut() {
     this.setState({ authenticated: false });
   },
@@ -9315,97 +9270,74 @@ var WebLog_default = react_0_12_min_default.createClass({
       this.loadEntries
     );
   },
-  getSlice() {
-    var list = this.list;
-    var start = this.state.slice.start;
-    var end = this.state.slice.end;
-    var ids = Object.keys(list).sort().reverse().slice(start, end);
-    return ids.map(function(id2) {
-      return list[id2];
-    });
-  },
-  loadIndex(err2, index) {
-    this.index = index.reverse();
-    this.loadEntries();
-  },
-  loadEntries() {
-    var connector = this.connector;
-    var setEntry = this.setEntry;
-    var start = this.state.slice.start;
-    var end = this.state.slice.end;
-    var slice = this.index.slice(start, end);
-    var cache = this.list;
-    (/* @__PURE__ */ __name(function next(list) {
-      if (list.length === 0) return;
-      var id2 = list.splice(0, 1)[0];
-      if (cache[id2]) return next(list);
-      connector.loadMetadata(id2, function(err2, metadata) {
-        if (err2) {
-          console.error("no metadata found for id: " + id2 + " (" + err2 + ")");
-          next(list);
-          return;
-        }
-        connector.loadEntry(id2, function(err3, postdata) {
-          if (err3) {
-            console.error(
-              "no post data found for id: " + id2 + " (" + err3 + ")"
-            );
-            next(list);
-            return;
-          }
-          setEntry(id2, metadata, postdata);
-          next(list);
-        });
-      });
+  // ------------------------------------------------------------
+  loadEntries(id2) {
+    const { updateEntry, connector, state } = this;
+    const { entryIds } = state;
+    const start = state.slice.start;
+    const end = state.slice.end;
+    const slice = id2 ? [id2] : entryIds.slice(start, end);
+    (/* @__PURE__ */ __name(async function next(list) {
+      if (!list.length) return;
+      const id3 = list.shift();
+      const metaData = await connector.loadMetaData(id3);
+      const postData = await connector.loadPostData(id3);
+      updateEntry(id3, metaData, postData);
+      next(list);
     }, "next"))(slice);
   },
-  setEntry(id2, metadata, postdata) {
-    metadata.id = id2;
-    if (this.index.indexOf(id2) === -1) {
-      this.index.push(id2);
-    }
-    this.list[id2] = {
-      metadata,
-      postdata
-    };
-    this.setState({ entries: this.list });
-  },
-  create() {
-    var date = /* @__PURE__ */ new Date();
-    var timestamp = date.getTime();
-    var metadata = {
+  createEntry() {
+    const date = /* @__PURE__ */ new Date();
+    const timestamp = date.getTime();
+    const metaData = {
       title: "New Entry",
       created: timestamp,
       published: timestamp,
-      // we can turn this into -1 for drafts
       updated: timestamp,
-      tags: []
+      tags: [],
+      draft: void 0
     };
-    var postdata = "...click here to start editing your post...";
-    var id2 = timeToId(timestamp);
-    this.setEntry(id2, metadata, postdata);
+    const postData = "...click here to start editing your post...";
+    const id2 = timeToId(timestamp);
+    this.updateEntry(id2, metaData, postData);
   },
-  save(entry2) {
-    this.setEntry(entry2.state.id, entry2.getMetaData(), entry2.postdata);
-    this.saveRSS();
-    this.connector.saveEntry(entry2, this.index, () => {
-      console.log("save handled");
-    });
+  updateEntry(id2, metaData, postData) {
+    const { entries, index } = this.state;
+    entries[id2] = { metaData, postData };
+    const { title, published, category, draft } = metaData;
+    index[id2] = { title, published, category, draft };
+    this.setState({ entries, index });
   },
-  delete(entry2) {
-    var confirmed = confirm("really delete post?");
-    if (confirmed) {
+  saveEntry(entry2) {
+    const id2 = entry2.state.id;
+    const metaData = entry2.getMetaData();
+    const postData = entry2.postData;
+    this.updateEntry(id2, metaData, postData);
+    this.connector.saveEntry(
+      { id: id2, metaData, postData },
+      this.state.index,
+      () => {
+        console.log("save handled");
+        this.saveRSS();
+      }
+    );
+  },
+  deleteEntry(entry2) {
+    if (confirm("really delete post?")) {
       var id2 = entry2.state.id;
-      var pos = this.index.indexOf(id2);
-      this.index.splice(pos, 1);
-      delete this.list[id2];
-      this.setState({ entries: this.list });
-      this.connector.deleteEntry(entry2, this.index, () => {
+      const { entryIds, entries, index } = this.state;
+      const pos = entryIds.indexOf(id2);
+      entryIds.splice(pos, 1);
+      delete entries[id2];
+      delete index[id2];
+      this.setState({ entryIds, entries, index });
+      this.connector.deleteEntry(id2, index, () => {
         console.log("delete handled");
         this.saveRSS();
       });
     }
   },
+  // ------------------------------------------------------------
   saveRSS() {
     var connector = this.connector;
     console.log(`Updating RSS...`);
@@ -9431,13 +9363,15 @@ var WebLog_default = react_0_12_min_default.createClass({
     if (this.state.singleton) return;
     if (this.state.slice.start >= 10) return;
     const { base } = this.props;
+    const html = document.getElementById(`gh-weblog`);
+    const { description } = html.dataset;
     var rssHeading = `<?xml version="1.0" encoding="UTF-8" ?>
   <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
     <channel>
       <atom:link href="${base}/${this.props.path}/rss.xml" rel="self" type="application/rss+xml" />
-      <title>${this.props.title}</title>
-      <description>${this.props.description}${category ? ` [${category} posts only]` : ``}</description>
-      <link>${base}</link>
+      <title>${document.title}</title>
+      <description>${description}${category ? ` [${category} posts only]` : ``}</description>
+      <link>${location.toString()}</link>
       <lastBuildDate>${(/* @__PURE__ */ new Date()).toUTCString()}</lastBuildDate>
       <pubDate>${(/* @__PURE__ */ new Date()).toUTCString()}</pubDate>
       <ttl>1440</ttl>
@@ -9454,13 +9388,23 @@ var WebLog_default = react_0_12_min_default.createClass({
   }
 });
 
-// components/App.jsx
+// components/index.jsx
 var settings = weblogsettings_default.getSettings();
 var id = settings.target || "gh-weblog";
 var target = document.getElementById(id);
+async function handleCategories(categories) {
+  console.log(categories);
+}
+__name(handleCategories, "handleCategories");
 if (!target) {
   const msg = `no target element with id '${id}' found to inject gh-weblog into.`;
   console.error(msg);
 } else {
-  react_0_12_min_default.render(react_0_12_min_default.createElement(WebLog_default, settings), target);
+  react_0_12_min_default.render(
+    react_0_12_min_default.createElement(WebLog_default, {
+      ...settings,
+      onCategories: handleCategories
+    }),
+    target
+  );
 }

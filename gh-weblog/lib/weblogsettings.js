@@ -6,7 +6,7 @@ const settingsName = `gh-weblog-settings-${loc}`;
 export const WebLogSettings = {
   getSettings() {
     const settings = localStorage[settingsName];
-    if (!settings) return;
+    if (!settings) return {};
     return JSON.parse(settings);
   },
 

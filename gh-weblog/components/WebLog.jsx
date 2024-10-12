@@ -1,13 +1,20 @@
-import React from "../lib/vendor/react/react.0.12.min.js";
+import { React, createClass } from "../lib/create-component.js";
 import utils from "../lib/utils.js";
 import Admin from "./Admin.jsx";
 import Entry from "./Entry.jsx";
 
 import WebLogSettings from "../lib/weblogsettings.js";
 import Connector from "../lib/connector.js";
-import timeToId from "../lib/timetoid.js";
 
-export default React.createClass({
+function timeToId(timestamp) {
+  if (!timestamp) return false;
+  var d = new Date(parseInt(timestamp, 10));
+  var s = d.toISOString();
+  var id = s.replace("T", "-").replace(/\..*/, "").replace(/\:/g, "-");
+  return id;
+}
+
+export default createClass({
   // local cache, because we don't want to load the entire
   // index at once, and we don't want to requery for it.
   index: [],
@@ -16,70 +23,77 @@ export default React.createClass({
   // be modified multiple times per time slice.
   list: {},
 
-  getInitialState() {
-    return {
-      singleton: false,
-      entries: this.list,
-      slice: { start: 0, end: 10 },
-      githubissues: "",
-      authenticated: false,
-      site: "",
-      issues: "",
-    };
+  initialState: {
+    singleton: false,
+    entries: {},
+    entryIds: [],
+    index: {},
+    slice: { start: 0, end: 10 },
+    authenticated: false,
+    site: ``,
+    issues: ``,
+    categories: undefined,
   },
 
-  componentDidMount() {
-    const settings = WebLogSettings.getSettings();
-    if (settings) {
-      this.connector = new Connector(settings);
-      if (settings.token) {
-        this.setState({ authenticated: true });
-      }
-    } else {
-      this.connector = new this.Connector();
-    }
-
+  getPostId() {
     // are we loading one entry, or "all" entries?
-    var fragmentId = location.hash || false;
+    let fragmentId = location.hash || false;
     if (fragmentId) {
-      if (fragmentId.indexOf("#gh-weblog") > -1) {
-        fragmentId = fragmentId.replace("#gh-weblog-", "");
+      if (fragmentId.indexOf(`#gh-weblog`) > -1) {
+        fragmentId = fragmentId.replace(`#gh-weblog-`, ``);
       } else {
         fragmentId = false;
       }
     }
-    var id = timeToId(fragmentId);
+    const id = timeToId(fragmentId);
     if (id) {
       this.setState({ singleton: true });
     }
+    return id;
+  },
+
+  setIssueTracker() {
+    const site = document.getElementById(`gh-weblog`).dataset.site;
+    this.setState({ site, issues: `${site}/issues` });
+  },
+
+  async onMount() {
+    this.loadSettings();
+    const id = this.getPostId();
 
     // load the necessary index information
-    this.connector.loadIndex(this.loadIndex, id);
-
-    // determine the issue tracker to use:
-    var a = document.createElement("a");
-    a.href = this.props.base;
-    var user = a.host.replace(".github.io", "");
-    var path = a.pathname.replace(/^\//, "").trim().split("/")[0];
-    var repo = path ? path : a.host;
-    this.setState({
-      site: "http://github.com/" + user + "/" + repo,
-      issues: "http://github.com/" + user + "/" + repo + "/issues",
-    });
+    const index = await this.connector.loadIndex();
+    const categories = new Set();
+    Object.values(index).forEach((e) => categories.add(e.category));
+    this.setState(
+      {
+        index,
+        categories: [...categories],
+        entryIds: Object.keys(index).sort().reverse(),
+      },
+      () => {
+        this.props.onCategories?.(this.state.categories);
+        this.loadEntries(id);
+        this.setIssueTracker();
+      }
+    );
   },
 
   render() {
-    if (!!this.state.singleton) {
+    const { state } = this;
+
+    if (!!state.singleton) {
       return this.renderContent();
     }
-    var postbutton = this.state.authenticated ? (
-      <button className="admin post button" onClick={this.create}>
+
+    var postButton = state.authenticated ? (
+      <button className="admin post button" onClick={this.createEntry}>
         new entry
       </button>
     ) : (
       false
     );
-    var adminbutton = (
+    var adminButton = (
       <button
         className="authenticate"
         onClick={this.showSettings}
@@ -88,11 +102,11 @@ export default React.createClass({
         admin
       </button>
     );
-    var morebutton = <button onClick={this.more}>Load more posts</button>;
-    return this.renderContent(adminbutton, postbutton, morebutton);
+    var moreButton = <button onClick={this.more}>Load more posts</button>;
+    return this.renderContent(adminButton, postButton, moreButton);
   },
 
-  renderContent(adminbutton, postbutton, morebutton) {
+  renderContent(adminButton, postButton, moreButton) {
     // ensure the URL looks "normal"
     var entry = false;
     if (arguments.length === 0) {
@@ -100,8 +114,8 @@ export default React.createClass({
       if (!entry) {
         return false;
       }
-      var title = utils.titleReplace(entry.metadata.title);
-      var vanityURL = ["/", entry.metadata.created, "/", title].join("");
+      var title = utils.titleReplace(entry.metaData.title);
+      var vanityURL = ["/", entry.metaData.created, "/", title].join("");
       history.replaceState({}, title, vanityURL);
     }
     return (
@@ -112,38 +126,51 @@ export default React.createClass({
           onClose={this.bindSettings}
           onLogout={this.onLogOut}
         />
-        {adminbutton}
-        {postbutton}
+        {adminButton}
+        {postButton}
         {this.generateEntries(entry ? [entry] : false)}
-        {morebutton}
+        {moreButton}
       </div>
     );
   },
 
+  getSlice() {
+    const { state } = this;
+    var start = state.slice.start;
+    var end = state.slice.end;
+    var ids = state.entryIds.slice(start, end);
+    return ids.map((id) => state.entries[id]).filter(Boolean);
+  },
+
   generateEntries(entries) {
     entries = entries || this.getSlice();
+    if (!entries.length) return;
+
+    const { issues, singleton, authenticated } = this.state;
+
     return entries.map((entry) => {
-      return (
+      return entry.metaData.draft && !authenticated ? null : (
         <Entry
-          key={entry.metadata.created}
-          ref={entry.metadata.id}
-          issues={this.state.issues}
-          metadata={entry.metadata}
-          postdata={entry.postdata}
-          editable={!this.state.singleton && this.state.authenticated}
-          runProcessors={this.runProcessors}
-          onSave={this.save}
-          onDelete={this.delete}
+          key={entry.metaData.created}
+          ref={entry.metaData.id}
+          issues={issues}
+          metaData={entry.metaData}
+          postData={entry.postData}
+          editable={!singleton && authenticated}
+          onSave={this.saveEntry}
+          onDelete={this.deleteEntry}
         />
       );
     });
   },
 
-  runProcessors(domNode) {
-    if (this.props.processors && this.props.processors instanceof Array) {
-      this.props.processors.forEach(function (process) {
-        process(domNode);
-      });
+  // ------------------------------------------------------------
+
+  loadSettings() {
+    const settings = WebLogSettings.getSettings();
+    this.connector = new Connector(settings);
+    if (settings && settings.token) {
+      this.setState({ authenticated: true });
     }
   },
 
@@ -157,6 +184,8 @@ export default React.createClass({
       this.setState({ authenticated: true });
     }
   },
+
+  // ------------------------------------------------------------
 
   onLogOut() {
     this.setState({ authenticated: false });
@@ -174,107 +203,87 @@ export default React.createClass({
     );
   },
 
-  getSlice() {
-    var list = this.list;
-    var start = this.state.slice.start;
-    var end = this.state.slice.end;
-    var ids = Object.keys(list).sort().reverse().slice(start, end);
-    return ids.map(function (id) {
-      return list[id];
-    });
-  },
+  // ------------------------------------------------------------
 
-  loadIndex(err, index) {
-    // latest entry on top
-    this.index = index.reverse();
-    this.loadEntries();
-  },
+  loadEntries(id) {
+    const { updateEntry, connector, state } = this;
+    const { entryIds } = state;
 
-  loadEntries() {
-    var connector = this.connector;
-    var setEntry = this.setEntry;
     // find load slice
-    var start = this.state.slice.start;
-    var end = this.state.slice.end;
-    var slice = this.index.slice(start, end);
-    var cache = this.list;
+    const start = state.slice.start;
+    const end = state.slice.end;
+    const slice = id ? [id] : entryIds.slice(start, end);
+
     // run through all
-    (function next(list) {
-      if (list.length === 0) return;
-      var id = list.splice(0, 1)[0];
-      if (cache[id]) return next(list);
-      connector.loadMetadata(id, function (err, metadata) {
-        if (err) {
-          console.error("no metadata found for id: " + id + " (" + err + ")");
-          next(list);
-          return;
-        }
-        connector.loadEntry(id, function (err, postdata) {
-          if (err) {
-            console.error(
-              "no post data found for id: " + id + " (" + err + ")"
-            );
-            next(list);
-            return;
-          }
-          setEntry(id, metadata, postdata);
-          next(list);
-        });
-      });
+    (async function next(list) {
+      if (!list.length) return;
+      const id = list.shift();
+      const metaData = await connector.loadMetaData(id);
+      const postData = await connector.loadPostData(id);
+      updateEntry(id, metaData, postData);
+      next(list);
     })(slice);
   },
 
-  setEntry(id, metadata, postdata) {
-    metadata.id = id;
-    if (this.index.indexOf(id) === -1) {
-      this.index.push(id);
-    }
-    this.list[id] = {
-      metadata: metadata,
-      postdata: postdata,
-    };
-    this.setState({ entries: this.list });
-  },
-
-  create() {
-    var date = new Date();
-    var timestamp = date.getTime();
-    var metadata = {
+  createEntry() {
+    const date = new Date();
+    const timestamp = date.getTime();
+    const metaData = {
       title: "New Entry",
       created: timestamp,
-      published: timestamp, // we can turn this into -1 for drafts
+      published: timestamp,
       updated: timestamp,
       tags: [],
+      draft: undefined,
     };
-    var postdata = "...click here to start editing your post...";
-    var id = timeToId(timestamp);
-    this.setEntry(id, metadata, postdata);
+    const postData = "...click here to start editing your post...";
+    const id = timeToId(timestamp);
+    this.updateEntry(id, metaData, postData);
   },
 
-  save(entry) {
-    this.setEntry(entry.state.id, entry.getMetaData(), entry.postdata);
-    this.saveRSS();
-    this.connector.saveEntry(entry, this.index, () => {
-      console.log("save handled");
-    });
+  updateEntry(id, metaData, postData) {
+    const { entries, index } = this.state;
+    entries[id] = { metaData, postData };
+    const { title, published, category, draft } = metaData;
+    index[id] = { title, published, category, draft };
+    this.setState({ entries, index });
   },
 
-  delete(entry) {
-    var confirmed = confirm("really delete post?");
-    if (confirmed) {
+  saveEntry(entry) {
+    const id = entry.state.id;
+    const metaData = entry.getMetaData();
+    const postData = entry.postData;
+    this.updateEntry(id, metaData, postData);
+    this.connector.saveEntry(
+      { id, metaData, postData },
+      this.state.index,
+      () => {
+        console.log("save handled");
+        this.saveRSS();
+      }
+    );
+  },
+
+  deleteEntry(entry) {
+    if (confirm("really delete post?")) {
       var id = entry.state.id;
-      // remove from index:
-      var pos = this.index.indexOf(id);
-      this.index.splice(pos, 1);
-      // remove from list of loaded entries:
-      delete this.list[id];
-      this.setState({ entries: this.list });
-      this.connector.deleteEntry(entry, this.index, () => {
+
+      // remove from entryIds, entries, and index
+      const { entryIds, entries, index } = this.state;
+      const pos = entryIds.indexOf(id);
+      entryIds.splice(pos, 1);
+      delete entries[id];
+      delete index[id];
+
+      this.setState({ entryIds, entries, index });
+      this.connector.deleteEntry(id, index, () => {
         console.log("delete handled");
         this.saveRSS();
       });
     }
   },
+
+  // ------------------------------------------------------------
 
   saveRSS() {
     var connector = this.connector;
@@ -312,6 +321,8 @@ export default React.createClass({
     if (this.state.slice.start >= 10) return;
 
     const { base } = this.props;
+    const html = document.getElementById(`gh-weblog`);
+    const { description } = html.dataset;
 
     // Boilerplate RSS 2.0 header
     var rssHeading = `<?xml version="1.0" encoding="UTF-8" ?>
@@ -320,11 +331,11 @@ export default React.createClass({
       <atom:link href="${base}/${
       this.props.path
     }/rss.xml" rel="self" type="application/rss+xml" />
-      <title>${this.props.title}</title>
-      <description>${this.props.description}${
+      <title>${document.title}</title>
+      <description>${description}${
       category ? ` [${category} posts only]` : ``
     }</description>
-      <link>${base}</link>
+      <link>${location.toString()}</link>
       <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
       <pubDate>${new Date().toUTCString()}</pubDate>
       <ttl>1440</ttl>

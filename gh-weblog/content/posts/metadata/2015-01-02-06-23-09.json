@@ -4,10 +4,6 @@
   "created": 1420179789753,
   "published": 1420179789753,
   "updated": 1420180080615,
-  "tags": [
-    "Github",
-    "Blog",
-    "Installation",
-    "Instructions"
-  ]
+  "category": "News",
+  "tags": ["Github", "Blog", "Installation", "Instructions"]
 }
