@@ -1,5 +1,5 @@
 // import Octokit from "../lib/vendor/octokit/octokit.js";
-import { Octokit } from "https://esm.sh/@octokit/core";
+import { Octokit } from "@octokit/core";
 
 export default class Connector {
   constructor(options) {
