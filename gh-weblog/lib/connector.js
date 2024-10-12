@@ -14,7 +14,7 @@ export default class Connector {
   }
 
   setProperties(options) {
-    this.path = options.path;
+    this.path = options.path || `gh-weblog`;
     this.octokit = new Octokit({ auth: options.token });
   }
 

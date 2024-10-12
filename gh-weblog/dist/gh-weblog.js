@@ -8494,7 +8494,7 @@ var Connector = class {
     }
   }
   setProperties(options2) {
-    this.path = options2.path;
+    this.path = options2.path || `gh-weblog`;
     this.octokit = new Octokit({ auth: options2.token });
   }
   async get(url) {
