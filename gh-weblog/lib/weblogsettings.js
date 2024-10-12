@@ -1,5 +1,5 @@
 const { pathname, host } = location;
-const suffix = pathname.lastIndexOf("/") === pathname.length - 1 ? path : "/";
+const suffix = pathname.lastIndexOf("/") === pathname.length - 1 ? pathname : "/";
 const loc = host + suffix;
 const settingsName = `gh-weblog-settings-${loc}`;
 

@@ -6423,7 +6423,7 @@ var utils_default = {
 
 // lib/weblogsettings.js
 var { pathname, host } = location;
-var suffix = pathname.lastIndexOf("/") === pathname.length - 1 ? path : "/";
+var suffix = pathname.lastIndexOf("/") === pathname.length - 1 ? pathname : "/";
 var loc = host + suffix;
 var settingsName = `gh-weblog-settings-${loc}`;
 var WebLogSettings = {
@@ -7685,19 +7685,19 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         return ETagResponse2;
       }();
       _cachedETags = {};
-      notifyStart = /* @__PURE__ */ __name(function(promise, path2) {
+      notifyStart = /* @__PURE__ */ __name(function(promise, path) {
         return typeof promise.notify === "function" ? promise.notify({
           type: "start",
-          path: path2
+          path
         }) : void 0;
       }, "notifyStart");
-      notifyEnd = /* @__PURE__ */ __name(function(promise, path2) {
+      notifyEnd = /* @__PURE__ */ __name(function(promise, path) {
         return typeof promise.notify === "function" ? promise.notify({
           type: "end",
-          path: path2
+          path
         }) : void 0;
       }, "notifyEnd");
-      _request = /* @__PURE__ */ __name(function(method, path2, data, options) {
+      _request = /* @__PURE__ */ __name(function(method, path, data, options) {
         var auth, headers, mimeType, promise;
         if (options == null) {
           options = {
@@ -7709,8 +7709,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         if ("PATCH" === method && clientOptions.usePostInsteadOfPatch) {
           method = "POST";
         }
-        if (!/^http/.test(path2)) {
-          path2 = "" + clientOptions.rootURL + path2;
+        if (!/^http/.test(path)) {
+          path = "" + clientOptions.rootURL + path;
         }
         mimeType = void 0;
         if (options.isBase64) {
@@ -7722,8 +7722,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         if (userAgent) {
           headers["User-Agent"] = userAgent;
         }
-        if (path2 in _cachedETags) {
-          headers["If-None-Match"] = _cachedETags[path2].eTag;
+        if (path in _cachedETags) {
+          headers["If-None-Match"] = _cachedETags[path].eTag;
         } else {
           headers["If-Modified-Since"] = "Thu, 01 Jan 1970 00:00:00 GMT";
         }
@@ -7740,7 +7740,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
         promise = newPromise2(function(resolve, reject) {
           var ajaxConfig, always, onError, xhrPromise, _this2 = this;
           ajaxConfig = {
-            url: path2,
+            url: path,
             type: method,
             contentType: "application/json",
             mimeType,
@@ -7762,7 +7762,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           xhrPromise = ajax(ajaxConfig);
           always = /* @__PURE__ */ __name(function(jqXHR) {
             var listener, rateLimit, rateLimitRemaining, _i, _len, _results;
-            notifyEnd(_this2, path2);
+            notifyEnd(_this2, path);
             rateLimit = parseFloat(
               jqXHR.getResponseHeader("X-RateLimit-Limit")
             );
@@ -7777,7 +7777,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
                   rateLimitRemaining,
                   rateLimit,
                   method,
-                  path2,
+                  path,
                   data,
                   options
                 )
@@ -7789,8 +7789,8 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             var converted, eTag, eTagResponse, i, links, valOptions, _i, _ref2;
             always(jqXHR);
             if (304 === jqXHR.status) {
-              if (clientOptions.useETags && _cachedETags[path2]) {
-                eTagResponse = _cachedETags[path2];
+              if (clientOptions.useETags && _cachedETags[path]) {
+                eTagResponse = _cachedETags[path];
                 return resolve(eTagResponse.data, eTagResponse.status, jqXHR);
               } else {
                 return resolve(jqXHR.responseText, status, jqXHR);
@@ -7825,7 +7825,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               }
               if ("GET" === method && jqXHR.getResponseHeader("ETag") && clientOptions.useETags) {
                 eTag = jqXHR.getResponseHeader("ETag");
-                _cachedETags[path2] = new ETagResponse(eTag, data, jqXHR.status);
+                _cachedETags[path] = new ETagResponse(eTag, data, jqXHR.status);
               }
               return resolve(data, jqXHR.status, jqXHR);
             }
@@ -7857,7 +7857,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           }, "onError");
           return (typeof xhrPromise["catch"] === "function" ? xhrPromise["catch"](onError) : void 0) || xhrPromise.fail(onError);
         });
-        notifyStart(promise, path2);
+        notifyStart(promise, path);
         return promise;
       }, "_request");
       toQueryString = /* @__PURE__ */ __name(function(options) {
@@ -8303,9 +8303,9 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               isBase64
             });
           };
-          this.getSha = function(branch, path2) {
+          this.getSha = function(branch, path) {
             var _this2 = this;
-            if (path2 === "") {
+            if (path === "") {
               return this.getRef("heads/" + branch);
             }
             return this.getTree(branch, {
@@ -8313,7 +8313,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             }).then(function(tree) {
               var file;
               file = _.select(tree, function(file2) {
-                return file2.path === path2;
+                return file2.path === path;
               })[0];
               if (file != null ? file.sha : void 0) {
                 return file != null ? file.sha : void 0;
@@ -8323,7 +8323,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.getContents = function(path2, sha) {
+          this.getContents = function(path, sha) {
             var queryString, _this2 = this;
             if (sha == null) {
               sha = null;
@@ -8336,7 +8336,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             }
             return _request(
               "GET",
-              "" + _repoPath + "/contents/" + path2 + queryString,
+              "" + _repoPath + "/contents/" + path + queryString,
               null,
               {
                 raw: true
@@ -8345,7 +8345,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               return contents;
             });
           };
-          this.removeFile = function(path2, message, sha, branch) {
+          this.removeFile = function(path, message, sha, branch) {
             var params;
             params = {
               message,
@@ -8354,7 +8354,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
             };
             return _request(
               "DELETE",
-              "" + _repoPath + "/contents/" + path2,
+              "" + _repoPath + "/contents/" + path,
               params,
               null
             );
@@ -8511,10 +8511,10 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.read = function(path2, isBase64) {
+          this.read = function(path, isBase64) {
             var _this2 = this;
             return _getRef().then(function(branch) {
-              return _git.getSha(branch, path2).then(function(sha) {
+              return _git.getSha(branch, path).then(function(sha) {
                 return _git.getBlob(sha, isBase64).then(function(bytes) {
                   return {
                     sha,
@@ -8524,38 +8524,38 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.contents = function(path2) {
+          this.contents = function(path) {
             var _this2 = this;
             return _getRef().then(function(branch) {
               return _git.getSha(branch, "").then(function(sha) {
-                return _git.getContents(path2, sha).then(function(contents) {
+                return _git.getContents(path, sha).then(function(contents) {
                   return contents;
                 });
               });
             });
           };
-          this.remove = function(path2, message, sha) {
+          this.remove = function(path, message, sha) {
             var _this2 = this;
             if (message == null) {
-              message = "Removed " + path2;
+              message = "Removed " + path;
             }
             if (sha == null) {
               sha = null;
             }
             return _getRef().then(function(branch) {
               if (sha) {
-                return _git.removeFile(path2, message, sha, branch);
+                return _git.removeFile(path, message, sha, branch);
               } else {
-                return _git.getSha(branch, path2).then(function(sha2) {
-                  return _git.removeFile(path2, message, sha2, branch);
+                return _git.getSha(branch, path).then(function(sha2) {
+                  return _git.removeFile(path, message, sha2, branch);
                 });
               }
             });
           };
-          this.move = function(path2, newPath, message) {
+          this.move = function(path, newPath, message) {
             var _this2 = this;
             if (message == null) {
-              message = "Moved " + path2;
+              message = "Moved " + path;
             }
             return _getRef().then(function(branch) {
               return _git._updateTree(branch).then(function(latestCommit) {
@@ -8563,7 +8563,7 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
                   recursive: true
                 }).then(function(tree) {
                   _.each(tree, function(ref) {
-                    if (ref.path === path2) {
+                    if (ref.path === path) {
                       ref.path = newPath;
                     }
                     if (ref.type === "tree") {
@@ -8581,16 +8581,16 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               });
             });
           };
-          this.write = function(path2, content, message, isBase64, parentCommitSha) {
+          this.write = function(path, content, message, isBase64, parentCommitSha) {
             var contents;
             if (message == null) {
-              message = "Changed " + path2;
+              message = "Changed " + path;
             }
             if (parentCommitSha == null) {
               parentCommitSha = null;
             }
             contents = {};
-            contents[path2] = {
+            contents[path] = {
               content,
               isBase64
             };
@@ -8609,13 +8609,13 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
               afterParentCommitShas = /* @__PURE__ */ __name(function(parentCommitShas2) {
                 var promises;
                 promises = _.map(_.pairs(contents), function(_arg) {
-                  var content, data, isBase64, path2, _this3 = this;
-                  path2 = _arg[0], data = _arg[1];
+                  var content, data, isBase64, path, _this3 = this;
+                  path = _arg[0], data = _arg[1];
                   content = data.content || data;
                   isBase64 = data.isBase64 || false;
                   return _git.postBlob(content, isBase64).then(function(blob) {
                     return {
-                      path: path2,
+                      path,
                       mode: "100644",
                       type: "blob",
                       sha: blob
@@ -8693,12 +8693,12 @@ makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttp
           this.getInfo = function() {
             return _request("GET", this.repoPath, null);
           };
-          this.getContents = function(branch, path2) {
+          this.getContents = function(branch, path) {
             return _request(
               "GET",
               "" + this.repoPath + "/contents?ref=" + branch,
               {
-                path: path2
+                path
               }
             );
           };
@@ -9047,16 +9047,16 @@ var Connector = class {
     return this.get(`${this.options.path}/content/posts/markdown/${id2}.md`);
   }
   saveEntry({ id: id2, metaData, postData }, index, saved) {
-    const path2 = `${this.options.path}/content/posts/`;
+    const path = `${this.options.path}/content/posts/`;
     const commitMessage = `Saving new entry ${id2}`;
     const content = {};
     const indexData = JSON.stringify(index, false, 2);
-    const indexFilename = `${path2}index.json`;
+    const indexFilename = `${path}index.json`;
     content[indexFilename] = indexData;
     metaData = JSON.stringify(metaData, false, 2);
-    const metaDataFilename = `${path2}metaData/${id2}.json`;
+    const metaDataFilename = `${path}metaData/${id2}.json`;
     content[metaDataFilename] = metaData;
-    const postDataFilename = `${path2}markdown/${id2}.md`;
+    const postDataFilename = `${path}markdown/${id2}.md`;
     content[postDataFilename] = postData;
     try {
       this.branch.writeMany(content, commitMessage).then(function() {
@@ -9070,12 +9070,12 @@ var Connector = class {
   }
   deleteEntry(entry2, index, deleted) {
     const id2 = entry2.state.id;
-    const path2 = `${this.options.path}/content/posts/`;
+    const path = `${this.options.path}/content/posts/`;
     const commitMessage = `Removing entry ${id2}`;
     const indexData = JSON.stringify({ index: index.sort() }, false, 2);
-    const indexFilename = `${path2}index.json`;
-    const metaDataFilename = `${path2}metaData/${id2}.json`;
-    const postDataFilename = `${path2}markdown/${id2}.md`;
+    const indexFilename = `${path}index.json`;
+    const metaDataFilename = `${path}metaData/${id2}.json`;
+    const postDataFilename = `${path}markdown/${id2}.md`;
     const branch = this.branch;
     try {
       branch.write(indexFilename, indexData, commitMessage).then(() => branch.remove(metaDataFilename, commitMessage)).then(() => branch.remove(postDataFilename, commitMessage)).then(() => {
