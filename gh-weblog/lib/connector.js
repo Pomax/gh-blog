@@ -1,4 +1,5 @@
-import Octokit from "../lib/vendor/octokit/octokit.js";
+// import Octokit from "../lib/vendor/octokit/octokit.js";
+import { Octokit } from "https://esm.sh/@octokit/core";
 
 export default class Connector {
   constructor(options) {
@@ -14,11 +15,7 @@ export default class Connector {
 
   setProperties(options) {
     this.path = options.path;
-    this.repo = new Octokit({ token: options.token }).getRepo(
-      options.user,
-      options.repo
-    );
-    this.branch = this.repo.getBranch(options.branch);
+    this.octokit = new Octokit({ auth: options.token });
   }
 
   async get(url) {
@@ -31,47 +28,90 @@ export default class Connector {
   }
 
   async loadIndex() {
-    return await this.get(`${this.options.path}/content/posts/index.json`);
+    return await this.get(`${this.path}/content/posts/index.json`);
   }
 
   async loadMetaData(id) {
-    return this.get(`${this.options.path}/content/posts/metadata/${id}.json`);
+    return this.get(`${this.path}/content/posts/metadata/${id}.json`);
   }
 
   async loadPostData(id) {
-    return this.get(`${this.options.path}/content/posts/markdown/${id}.md`);
+    return this.get(`${this.path}/content/posts/markdown/${id}.md`);
   }
 
-  saveEntry({ id, metaData, postData }, index, saved) {
-    const path = `${this.options.path}/content/posts/`;
+  // -----------------------------------------------------------
+
+  async getCurrentSha() {
+    const { octokit, user, repo, branch, path } = options;
+    return (
+      await octokit.request(`GET /repos/${user}/${repo}commits/${branch}`)
+    ).data.sha;
+  }
+
+  async makeBlob(data) {
+    const { user, repo } = this.options;
+    const blobData = await this.octokit.git.createBlob({
+      owner: user,
+      repo,
+      data,
+      encoding: "utf-8",
+    });
+    return blobData.data;
+  }
+
+  async saveEntry({ id, metaData, postData }, index, saved) {
+    const { options, octokit } = this;
+    const { user, repo, branch } = options;
+    const path = `${this.path}/content/posts/`;
     const commitMessage = `Saving new entry ${id}`;
     const content = {};
 
     const indexData = JSON.stringify(index, false, 2);
     const indexFilename = `${path}index.json`;
-    content[indexFilename] = indexData;
+    content[indexFilename] = await this.makeBlob(indexData);
 
     metaData = JSON.stringify(metaData, false, 2);
     const metaDataFilename = `${path}metadata/${id}.json`;
-    content[metaDataFilename] = metaData;
+    content[metaDataFilename] = await this.makeBlob(metaData);
 
     const postDataFilename = `${path}markdown/${id}.md`;
-    content[postDataFilename] = postData;
+    content[postDataFilename] = await this.makeBlob(postData);
 
-    try {
-      this.branch.writeMany(content, commitMessage).then(function () {
-        console.log(`Saved entry ${id} to github.`);
-        if (saved) saved(entry);
-      });
-    } catch (e) {
-      console.error(`saving went horribly wrong`);
-      throw e;
-    }
+    const paths = Object.keys(content);
+    const blobs = Object.values(content);
+    const currentSha = this.getCurrentSha();
+
+    const { data: newTree } = await octokit.git.createTree({
+      owner: user,
+      repo,
+      tree: blobs.map(({ sha }, index) => ({
+        path: paths[index],
+        mode: `100644`,
+        type: `blob`,
+        sha,
+      })),
+      base_tree: currentSha,
+    });
+
+    const { data: newCommit } = await octokit.git.createCommit({
+      owner: user,
+      repo,
+      message: commitMessage,
+      tree: newTree.sha,
+      parents: [currentSha],
+    });
+
+    octokit.git.updateRef({
+      owner: user,
+      repo,
+      ref: `heads/${branch}`,
+      sha: newCommit.sha,
+    });
   }
 
   deleteEntry(entry, index, deleted) {
     const id = entry.state.id;
-    const path = `${this.options.path}/content/posts/`;
+    const path = `${this.path}/content/posts/`;
     const commitMessage = `Removing entry ${id}`;
 
     const indexData = JSON.stringify({ index: index.sort() }, false, 2);
@@ -103,7 +143,7 @@ export default class Connector {
       category = false;
     }
     category = category ? `${category}-` : ``;
-    const rssFilename = `${this.options.path}/${category}rss.xml`;
+    const rssFilename = `${this.path}/${category}rss.xml`;
     const commitMessage = `Update to RSS XML`;
 
     try {

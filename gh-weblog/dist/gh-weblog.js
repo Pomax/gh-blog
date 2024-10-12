@@ -379,11 +379,11 @@ var react_0_12_min_default = function() {
           }
           __name(o, "o");
           function a(e2, t2) {
-            _2 = e2, w = t2, _2.attachEvent("onchange", r);
+            _ = e2, w = t2, _.attachEvent("onchange", r);
           }
           __name(a, "a");
           function i() {
-            _2 && (_2.detachEvent("onchange", r), _2 = null, w = null);
+            _ && (_.detachEvent("onchange", r), _ = null, w = null);
           }
           __name(i, "i");
           function s(e2, t2, n2) {
@@ -395,14 +395,14 @@ var react_0_12_min_default = function() {
           }
           __name(u, "u");
           function c(e2, t2) {
-            _2 = e2, w = t2, T = e2.value, N = Object.getOwnPropertyDescriptor(
+            _ = e2, w = t2, T = e2.value, N = Object.getOwnPropertyDescriptor(
               e2.constructor.prototype,
               "value"
-            ), Object.defineProperty(_2, "value", k), _2.attachEvent("onpropertychange", p);
+            ), Object.defineProperty(_, "value", k), _.attachEvent("onpropertychange", p);
           }
           __name(c, "c");
           function l() {
-            _2 && (delete _2.value, _2.detachEvent("onpropertychange", p), _2 = null, w = null, T = null, N = null);
+            _ && (delete _.value, _.detachEvent("onpropertychange", p), _ = null, w = null, T = null, N = null);
           }
           __name(l, "l");
           function p(e2) {
@@ -421,7 +421,7 @@ var react_0_12_min_default = function() {
           }
           __name(f, "f");
           function h(e2) {
-            return e2 !== x.topSelectionChange && e2 !== x.topKeyUp && e2 !== x.topKeyDown || !_2 || _2.value === T ? void 0 : (T = _2.value, w);
+            return e2 !== x.topSelectionChange && e2 !== x.topKeyUp && e2 !== x.topKeyDown || !_ || _.value === T ? void 0 : (T = _.value, w);
           }
           __name(h, "h");
           function m(e2) {
@@ -449,7 +449,7 @@ var react_0_12_min_default = function() {
                 x.topSelectionChange
               ]
             }
-          }, _2 = null, w = null, T = null, N = null, I = false;
+          }, _ = null, w = null, T = null, N = null, I = false;
           C.canUseDOM && (I = b("change") && (!("documentMode" in document) || document.documentMode > 8));
           var S = false;
           C.canUseDOM && (S = b("input") && (!("documentMode" in document) || document.documentMode > 9));
@@ -1967,7 +1967,7 @@ var react_0_12_min_default = function() {
           }
           __name(s, "s");
           function u(e2, t2) {
-            return D(e2 && t2 && "object" == typeof e2 && "object" == typeof t2), _2(t2, function(t3, n2) {
+            return D(e2 && t2 && "object" == typeof e2 && "object" == typeof t2), _(t2, function(t3, n2) {
               D(void 0 === e2[n2]), e2[n2] = t3;
             }), e2;
           }
@@ -1985,7 +1985,7 @@ var react_0_12_min_default = function() {
             };
           }
           __name(l, "l");
-          var p = e("./ReactComponent"), d = e("./ReactContext"), f = e("./ReactCurrentOwner"), h = e("./ReactElement"), m = (e("./ReactElementValidator"), e("./ReactEmptyComponent")), v = e("./ReactErrorUtils"), g = e("./ReactLegacyElement"), y = e("./ReactOwner"), E = e("./ReactPerf"), C = e("./ReactPropTransferer"), R = e("./ReactPropTypeLocations"), M = (e("./ReactPropTypeLocationNames"), e("./ReactUpdates")), b = e("./Object.assign"), O = e("./instantiateReactComponent"), D = e("./invariant"), x = e("./keyMirror"), P = e("./keyOf"), _2 = (e("./monitorCodeUse"), e("./mapObject")), w = e("./shouldUpdateReactComponent"), T = (e("./warning"), P({ mixins: null })), N = x({
+          var p = e("./ReactComponent"), d = e("./ReactContext"), f = e("./ReactCurrentOwner"), h = e("./ReactElement"), m = (e("./ReactElementValidator"), e("./ReactEmptyComponent")), v = e("./ReactErrorUtils"), g = e("./ReactLegacyElement"), y = e("./ReactOwner"), E = e("./ReactPerf"), C = e("./ReactPropTransferer"), R = e("./ReactPropTypeLocations"), M = (e("./ReactPropTypeLocationNames"), e("./ReactUpdates")), b = e("./Object.assign"), O = e("./instantiateReactComponent"), D = e("./invariant"), x = e("./keyMirror"), P = e("./keyOf"), _ = (e("./monitorCodeUse"), e("./mapObject")), w = e("./shouldUpdateReactComponent"), T = (e("./warning"), P({ mixins: null })), N = x({
             DEFINE_ONCE: null,
             DEFINE_MANY: null,
             OVERRIDE_BASE: null,
@@ -2449,7 +2449,7 @@ var react_0_12_min_default = function() {
           }
           __name(r, "r");
           function o(e2) {
-            _2.call(P, e2) || (g(x.test(e2)), P[e2] = true);
+            _.call(P, e2) || (g(x.test(e2)), P[e2] = true);
           }
           __name(o, "o");
           function a(e2) {
@@ -2472,7 +2472,7 @@ var react_0_12_min_default = function() {
             source: true,
             track: true,
             wbr: true
-          }, x = /^[a-zA-Z][a-zA-Z:_\.\-\d]*$/, P = {}, _2 = {}.hasOwnProperty;
+          }, x = /^[a-zA-Z][a-zA-Z:_\.\-\d]*$/, P = {}, _ = {}.hasOwnProperty;
           a.displayName = "ReactDOMComponent", a.Mixin = {
             mountComponent: h.measure(
               "ReactDOMComponent",
@@ -3059,11 +3059,11 @@ var react_0_12_min_default = function() {
               head: N("head"),
               body: N("body")
             }), O.CompositeComponent.injectMixin(d), O.DOMProperty.injectDOMPropertyConfig(l), O.DOMProperty.injectDOMPropertyConfig(T), O.EmptyComponent.injectEmptyComponent("noscript"), O.Updates.injectReconcileTransaction(f.ReactReconcileTransaction), O.Updates.injectBatchingStrategy(h), O.RootIndex.injectCreateReactRootIndex(
-              c.canUseDOM ? a.createReactRootIndex : _2.createReactRootIndex
+              c.canUseDOM ? a.createReactRootIndex : _.createReactRootIndex
             ), O.Component.injectEnvironment(f);
           }
           __name(n, "n");
-          var r = e("./BeforeInputEventPlugin"), o = e("./ChangeEventPlugin"), a = e("./ClientReactRootIndex"), i = e("./CompositionEventPlugin"), s = e("./DefaultEventPluginOrder"), u = e("./EnterLeaveEventPlugin"), c = e("./ExecutionEnvironment"), l = e("./HTMLDOMPropertyConfig"), p = e("./MobileSafariClickEventPlugin"), d = e("./ReactBrowserComponentMixin"), f = e("./ReactComponentBrowserEnvironment"), h = e("./ReactDefaultBatchingStrategy"), m = e("./ReactDOMComponent"), v = e("./ReactDOMButton"), g = e("./ReactDOMForm"), y = e("./ReactDOMImg"), E = e("./ReactDOMInput"), C = e("./ReactDOMOption"), R = e("./ReactDOMSelect"), M = e("./ReactDOMTextarea"), b = e("./ReactEventListener"), O = e("./ReactInjection"), D = e("./ReactInstanceHandles"), x = e("./ReactMount"), P = e("./SelectEventPlugin"), _2 = e("./ServerReactRootIndex"), w = e("./SimpleEventPlugin"), T = e("./SVGDOMPropertyConfig"), N = e("./createFullPageComponent");
+          var r = e("./BeforeInputEventPlugin"), o = e("./ChangeEventPlugin"), a = e("./ClientReactRootIndex"), i = e("./CompositionEventPlugin"), s = e("./DefaultEventPluginOrder"), u = e("./EnterLeaveEventPlugin"), c = e("./ExecutionEnvironment"), l = e("./HTMLDOMPropertyConfig"), p = e("./MobileSafariClickEventPlugin"), d = e("./ReactBrowserComponentMixin"), f = e("./ReactComponentBrowserEnvironment"), h = e("./ReactDefaultBatchingStrategy"), m = e("./ReactDOMComponent"), v = e("./ReactDOMButton"), g = e("./ReactDOMForm"), y = e("./ReactDOMImg"), E = e("./ReactDOMInput"), C = e("./ReactDOMOption"), R = e("./ReactDOMSelect"), M = e("./ReactDOMTextarea"), b = e("./ReactEventListener"), O = e("./ReactInjection"), D = e("./ReactInstanceHandles"), x = e("./ReactMount"), P = e("./SelectEventPlugin"), _ = e("./ServerReactRootIndex"), w = e("./SimpleEventPlugin"), T = e("./SVGDOMPropertyConfig"), N = e("./createFullPageComponent");
           t.exports = { inject: n };
         },
         {
@@ -3673,7 +3673,7 @@ var react_0_12_min_default = function() {
             return I = null, t2;
           }
           __name(l, "l");
-          var p = e("./DOMProperty"), d = e("./ReactBrowserEventEmitter"), f = (e("./ReactCurrentOwner"), e("./ReactElement")), h = e("./ReactLegacyElement"), m = e("./ReactInstanceHandles"), v = e("./ReactPerf"), g = e("./containsNode"), y = e("./deprecated"), E = e("./getReactRootElementInContainer"), C = e("./instantiateReactComponent"), R = e("./invariant"), M = e("./shouldUpdateReactComponent"), b = (e("./warning"), h.wrapCreateElement(f.createElement)), O = m.SEPARATOR, D = p.ID_ATTRIBUTE_NAME, x = {}, P = 1, _2 = 9, w = {}, T = {}, N = [], I = null, S = {
+          var p = e("./DOMProperty"), d = e("./ReactBrowserEventEmitter"), f = (e("./ReactCurrentOwner"), e("./ReactElement")), h = e("./ReactLegacyElement"), m = e("./ReactInstanceHandles"), v = e("./ReactPerf"), g = e("./containsNode"), y = e("./deprecated"), E = e("./getReactRootElementInContainer"), C = e("./instantiateReactComponent"), R = e("./invariant"), M = e("./shouldUpdateReactComponent"), b = (e("./warning"), h.wrapCreateElement(f.createElement)), O = m.SEPARATOR, D = p.ID_ATTRIBUTE_NAME, x = {}, P = 1, _ = 9, w = {}, T = {}, N = [], I = null, S = {
             _instancesByReactRootID: w,
             scrollMonitor: /* @__PURE__ */ __name(function(e2, t2) {
               t2();
@@ -3685,7 +3685,7 @@ var react_0_12_min_default = function() {
               }), e2;
             }, "_updateRootComponent"),
             _registerComponent: /* @__PURE__ */ __name(function(e2, t2) {
-              R(t2 && (t2.nodeType === P || t2.nodeType === _2)), d.ensureScrollValueMonitoring();
+              R(t2 && (t2.nodeType === P || t2.nodeType === _)), d.ensureScrollValueMonitoring();
               var n2 = S.registerContainer(t2);
               return w[n2] = e2, n2;
             }, "_registerComponent"),
@@ -3725,7 +3725,7 @@ var react_0_12_min_default = function() {
               return r2 ? (S.unmountComponentFromNode(r2, e2), delete w[t2], delete T[t2], true) : false;
             }, "unmountComponentAtNode"),
             unmountComponentFromNode: /* @__PURE__ */ __name(function(e2, t2) {
-              for (e2.unmountComponent(), t2.nodeType === _2 && (t2 = t2.documentElement); t2.lastChild; )
+              for (e2.unmountComponent(), t2.nodeType === _ && (t2 = t2.documentElement); t2.lastChild; )
                 t2.removeChild(t2.lastChild);
             }, "unmountComponentFromNode"),
             findReactContainerForID: /* @__PURE__ */ __name(function(e2) {
@@ -6576,10 +6576,10 @@ block.tables = merge({}, block.gfm, {
   nptable: /^ *(\S.*\|.*)\n *([-:]+ *\|[-| :]*)\n((?:.*\|.*(?:\n|$))*)\n*/,
   table: /^ *\|(.+)\n *\|( *[-:]+[-| :]*)\n((?: *\|.*(?:\n|$))*)\n*/
 });
-function Lexer(options) {
+function Lexer(options2) {
   this.tokens = [];
   this.tokens.links = {};
-  this.options = options || marked.defaults;
+  this.options = options2 || marked.defaults;
   this.rules = block.normal;
   if (this.options.gfm) {
     if (this.options.tables) {
@@ -6591,8 +6591,8 @@ function Lexer(options) {
 }
 __name(Lexer, "Lexer");
 Lexer.rules = block;
-Lexer.lex = function(src, options) {
-  var lexer = new Lexer(options);
+Lexer.lex = function(src, options2) {
+  var lexer = new Lexer(options2);
   return lexer.lex(src);
 };
 Lexer.prototype.lex = function(src) {
@@ -6835,8 +6835,8 @@ inline.breaks = merge({}, inline.gfm, {
   br: replace(inline.br)("{2,}", "*")(),
   text: replace(inline.gfm.text)("{2,}", "*")()
 });
-function InlineLexer(links, options) {
-  this.options = options || marked.defaults;
+function InlineLexer(links, options2) {
+  this.options = options2 || marked.defaults;
   this.links = links;
   this.rules = inline.normal;
   this.renderer = this.options.renderer || new Renderer();
@@ -6856,8 +6856,8 @@ function InlineLexer(links, options) {
 }
 __name(InlineLexer, "InlineLexer");
 InlineLexer.rules = inline;
-InlineLexer.output = function(src, links, options) {
-  var inline2 = new InlineLexer(links, options);
+InlineLexer.output = function(src, links, options2) {
+  var inline2 = new InlineLexer(links, options2);
   return inline2.output(src);
 };
 InlineLexer.prototype.output = function(src) {
@@ -6976,8 +6976,8 @@ InlineLexer.prototype.mangle = function(text) {
   }
   return out;
 };
-function Renderer(options) {
-  this.options = options || {};
+function Renderer(options2) {
+  this.options = options2 || {};
 }
 __name(Renderer, "Renderer");
 Renderer.prototype.code = function(code, lang, escaped) {
@@ -7067,17 +7067,17 @@ Renderer.prototype.image = function(href, title, text) {
   out += this.options.xhtml ? "/>" : ">";
   return out;
 };
-function Parser(options) {
+function Parser(options2) {
   this.tokens = [];
   this.token = null;
-  this.options = options || marked.defaults;
+  this.options = options2 || marked.defaults;
   this.options.renderer = this.options.renderer || new Renderer();
   this.renderer = this.options.renderer;
   this.renderer.options = this.options;
 }
 __name(Parser, "Parser");
-Parser.parse = function(src, options, renderer) {
-  var parser = new Parser(options, renderer);
+Parser.parse = function(src, options2, renderer) {
+  var parser = new Parser(options2, renderer);
   return parser.parse(src);
 };
 Parser.prototype.parse = function(src) {
@@ -7188,12 +7188,12 @@ Parser.prototype.tok = function() {
     }
   }
 };
-function escape(html, encode2) {
-  return html.replace(!encode2 ? /&(?!#?\w+;)/g : /&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
+function escape(html, encode) {
+  return html.replace(!encode ? /&(?!#?\w+;)/g : /&/g, "&amp;").replace(/</g, "&lt;").replace(/>/g, "&gt;").replace(/"/g, "&quot;").replace(/'/g, "&#39;");
 }
 __name(escape, "escape");
 function unescape(html) {
-  return html.replace(/&([#\w]+);/g, function(_2, n) {
+  return html.replace(/&([#\w]+);/g, function(_, n) {
     n = n.toLowerCase();
     if (n === "colon") return ":";
     if (n.charAt(0) === "#") {
@@ -7247,14 +7247,14 @@ function marked(src, opt, callback) {
     }
     pending = tokens.length;
     var done = /* @__PURE__ */ __name(function() {
-      var out, err2;
+      var out, err;
       try {
         out = Parser.parse(tokens, opt);
       } catch (e) {
-        err2 = e;
+        err = e;
       }
       opt.highlight = highlight;
-      return err2 ? callback(err2) : callback(null, out);
+      return err ? callback(err) : callback(null, out);
     }, "done");
     if (!highlight || highlight.length < 3) {
       return done();
@@ -7266,7 +7266,7 @@ function marked(src, opt, callback) {
         if (token.type !== "code") {
           return --pending || done();
         }
-        return highlight(token.text, token.lang, function(err2, code) {
+        return highlight(token.text, token.lang, function(err, code) {
           if (code == null || code === token.text) {
             return --pending || done();
           }
@@ -7508,1526 +7508,25 @@ ${this.state.postData}`;
   }
 });
 
-// lib/vendor/octokit/octokit.js
-var Octokit, allPromises, createGlobalAndAMD, encode, err, injector, makeOctokit, newPromise, _ = {}, _ref, _this = globalThis, __hasProp = {}.hasOwnProperty, __extends = /* @__PURE__ */ __name(function(child, parent) {
-  for (var key in parent) {
-    if (__hasProp.call(parent, key)) child[key] = parent[key];
-  }
-  function ctor() {
-    this.constructor = child;
-  }
-  __name(ctor, "ctor");
-  ctor.prototype = parent.prototype;
-  child.prototype = new ctor();
-  child.__super__ = parent.prototype;
-  return child;
-}, "__extends"), __slice = [].slice;
-_.isEmpty = function(object) {
-  return Object.keys(object).length === 0;
-};
-_.isArray = Array.isArray || function(obj) {
-  return toString.call(obj) === "[object Array]";
-};
-_.defaults = function(object, values) {
-  var key, _i, _len, _ref2, _results;
-  _ref2 = Object.keys(values);
-  _results = [];
-  for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-    key = _ref2[_i];
-    _results.push(
-      function(key2) {
-        return object[key2] != null ? object[key2] : object[key2] = values[key2];
-      }(key)
-    );
-  }
-  return _results;
-};
-_.each = function(object, fn) {
-  var arr, key, _i, _len, _ref2, _results;
-  if (!object) {
-    return;
-  }
-  if (_.isArray(object)) {
-    object.forEach(fn);
-  }
-  arr = [];
-  _ref2 = Object.keys(object);
-  _results = [];
-  for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-    key = _ref2[_i];
-    _results.push(
-      function(key2) {
-        return fn(object[key2]);
-      }(key)
-    );
-  }
-  return _results;
-};
-_.pairs = function(object) {
-  var arr, key, _fn, _i, _len, _ref2;
-  arr = [];
-  _ref2 = Object.keys(object);
-  _fn = /* @__PURE__ */ __name(function(key2) {
-    return arr.push([key2, object[key2]]);
-  }, "_fn");
-  for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-    key = _ref2[_i];
-    _fn(key);
-  }
-  return arr;
-};
-_.map = function(object, fn) {
-  var arr, key, _fn, _i, _len, _ref2;
-  if (_.isArray(object)) {
-    return object.map(fn);
-  }
-  arr = [];
-  _ref2 = Object.keys(object);
-  _fn = /* @__PURE__ */ __name(function(key2) {
-    return arr.push(fn(object[key2]));
-  }, "_fn");
-  for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-    key = _ref2[_i];
-    _fn(key);
-  }
-  return arr;
-};
-_.last = function(object, n) {
-  var len;
-  len = object.length;
-  return object.slice(len - n, len);
-};
-_.select = function(object, fn) {
-  return object.filter(fn);
-};
-_.extend = function(object, template) {
-  var key, _fn, _i, _len, _ref2;
-  _ref2 = Object.keys(template);
-  _fn = /* @__PURE__ */ __name(function(key2) {
-    return object[key2] = template[key2];
-  }, "_fn");
-  for (_i = 0, _len = _ref2.length; _i < _len; _i++) {
-    key = _ref2[_i];
-    _fn(key);
-  }
-  return object;
-};
-_.toArray = function(object) {
-  return Array.prototype.slice.call(object);
-};
-makeOctokit = /* @__PURE__ */ __name(function(newPromise2, allPromises2, XMLHttpRequest2, base64encode, userAgent) {
-  var Octokit2, ajax, rejectedPromise, resolvedPromise;
-  ajax = /* @__PURE__ */ __name(function(options) {
-    return newPromise2(function(resolve, reject) {
-      var name, value, xhr, _ref2;
-      xhr = new XMLHttpRequest2();
-      xhr.dataType = options.dataType;
-      if (typeof xhr.overrideMimeType === "function") {
-        xhr.overrideMimeType(options.mimeType);
-      }
-      xhr.open(options.type, options.url);
-      if (options.data && "GET" !== options.type) {
-        xhr.setRequestHeader("Content-Type", options.contentType);
-      }
-      _ref2 = options.headers;
-      for (name in _ref2) {
-        value = _ref2[name];
-        xhr.setRequestHeader(name, value);
-      }
-      xhr.onreadystatechange = function() {
-        var _name, _ref1;
-        if (4 === xhr.readyState) {
-          if ((_ref1 = options.statusCode) != null) {
-            if (typeof _ref1[_name = xhr.status] === "function") {
-              _ref1[_name]();
-            }
-          }
-          if (xhr.status >= 200 && xhr.status < 300 || xhr.status === 304) {
-            return resolve(xhr);
-          } else {
-            return reject(xhr);
-          }
-        }
-      };
-      return xhr.send(options.data);
-    });
-  }, "ajax");
-  resolvedPromise = /* @__PURE__ */ __name(function(val) {
-    return newPromise2(function(resolve, reject) {
-      return resolve(val);
-    });
-  }, "resolvedPromise");
-  rejectedPromise = /* @__PURE__ */ __name(function(err2) {
-    return newPromise2(function(resolve, reject) {
-      return reject(err2);
-    });
-  }, "rejectedPromise");
-  Octokit2 = /* @__PURE__ */ function() {
-    function Octokit3(clientOptions) {
-      var AuthenticatedUser, Branch, ETagResponse, Gist, GitRepo, Organization, Repository, Team, User, clearCache, getCache, notifyEnd, notifyStart, setCache, toQueryString, _cachedETags, _client, _listeners, _request;
-      if (clientOptions == null) {
-        clientOptions = {};
-      }
-      _.defaults(clientOptions, {
-        rootURL: "https://api.github.com",
-        useETags: true,
-        usePostInsteadOfPatch: false
-      });
-      _client = this;
-      _listeners = [];
-      ETagResponse = /* @__PURE__ */ function() {
-        function ETagResponse2(eTag, data, status2) {
-          this.eTag = eTag;
-          this.data = data;
-          this.status = status2;
-        }
-        __name(ETagResponse2, "ETagResponse");
-        return ETagResponse2;
-      }();
-      _cachedETags = {};
-      notifyStart = /* @__PURE__ */ __name(function(promise, path) {
-        return typeof promise.notify === "function" ? promise.notify({
-          type: "start",
-          path
-        }) : void 0;
-      }, "notifyStart");
-      notifyEnd = /* @__PURE__ */ __name(function(promise, path) {
-        return typeof promise.notify === "function" ? promise.notify({
-          type: "end",
-          path
-        }) : void 0;
-      }, "notifyEnd");
-      _request = /* @__PURE__ */ __name(function(method, path, data, options) {
-        var auth, headers, mimeType, promise;
-        if (options == null) {
-          options = {
-            raw: false,
-            isBase64: false,
-            isBoolean: false
-          };
-        }
-        if ("PATCH" === method && clientOptions.usePostInsteadOfPatch) {
-          method = "POST";
-        }
-        if (!/^http/.test(path)) {
-          path = "" + clientOptions.rootURL + path;
-        }
-        mimeType = void 0;
-        if (options.isBase64) {
-          mimeType = "text/plain; charset=x-user-defined";
-        }
-        headers = {
-          Accept: "application/vnd.github.raw"
-        };
-        if (userAgent) {
-          headers["User-Agent"] = userAgent;
-        }
-        if (path in _cachedETags) {
-          headers["If-None-Match"] = _cachedETags[path].eTag;
-        } else {
-          headers["If-Modified-Since"] = "Thu, 01 Jan 1970 00:00:00 GMT";
-        }
-        if (clientOptions.token || clientOptions.username && clientOptions.password) {
-          if (clientOptions.token) {
-            auth = "token " + clientOptions.token;
-          } else {
-            auth = "Basic " + base64encode(
-              "" + clientOptions.username + ":" + clientOptions.password
-            );
-          }
-          headers["Authorization"] = auth;
-        }
-        promise = newPromise2(function(resolve, reject) {
-          var ajaxConfig, always, onError, xhrPromise, _this2 = this;
-          ajaxConfig = {
-            url: path,
-            type: method,
-            contentType: "application/json",
-            mimeType,
-            headers,
-            processData: false,
-            data: !options.raw && data && JSON.stringify(data) || data,
-            dataType: !options.raw ? "json" : void 0
-          };
-          if (options.isBoolean) {
-            ajaxConfig.statusCode = {
-              204: function() {
-                return resolve(true);
-              },
-              404: function() {
-                return resolve(false);
-              }
-            };
-          }
-          xhrPromise = ajax(ajaxConfig);
-          always = /* @__PURE__ */ __name(function(jqXHR) {
-            var listener, rateLimit, rateLimitRemaining, _i, _len, _results;
-            notifyEnd(_this2, path);
-            rateLimit = parseFloat(
-              jqXHR.getResponseHeader("X-RateLimit-Limit")
-            );
-            rateLimitRemaining = parseFloat(
-              jqXHR.getResponseHeader("X-RateLimit-Remaining")
-            );
-            _results = [];
-            for (_i = 0, _len = _listeners.length; _i < _len; _i++) {
-              listener = _listeners[_i];
-              _results.push(
-                listener(
-                  rateLimitRemaining,
-                  rateLimit,
-                  method,
-                  path,
-                  data,
-                  options
-                )
-              );
-            }
-            return _results;
-          }, "always");
-          xhrPromise.then(function(jqXHR) {
-            var converted, eTag, eTagResponse, i, links, valOptions, _i, _ref2;
-            always(jqXHR);
-            if (304 === jqXHR.status) {
-              if (clientOptions.useETags && _cachedETags[path]) {
-                eTagResponse = _cachedETags[path];
-                return resolve(eTagResponse.data, eTagResponse.status, jqXHR);
-              } else {
-                return resolve(jqXHR.responseText, status, jqXHR);
-              }
-            } else if (204 === jqXHR.status && options.isBoolean) {
-              return resolve(true, status, jqXHR);
-            } else {
-              if (jqXHR.responseText && "json" === ajaxConfig.dataType) {
-                data = JSON.parse(jqXHR.responseText);
-                valOptions = {};
-                links = jqXHR.getResponseHeader("Link");
-                _.each(
-                  links != null ? links.split(",") : void 0,
-                  function(part) {
-                    var discard, href, rel, _ref3;
-                    _ref3 = part.match(/<([^>]+)>;\ rel="([^"]+)"/), discard = _ref3[0], href = _ref3[1], rel = _ref3[2];
-                    return valOptions["" + rel + "Page"] = function() {
-                      return _request("GET", href, null, options);
-                    };
-                  }
-                );
-                _.extend(data, valOptions);
-              } else {
-                data = jqXHR.responseText;
-              }
-              if ("GET" === method && options.isBase64) {
-                converted = "";
-                for (i = _i = 0, _ref2 = data.length; 0 <= _ref2 ? _i <= _ref2 : _i >= _ref2; i = 0 <= _ref2 ? ++_i : --_i) {
-                  converted += String.fromCharCode(data.charCodeAt(i) & 255);
-                }
-                data = converted;
-              }
-              if ("GET" === method && jqXHR.getResponseHeader("ETag") && clientOptions.useETags) {
-                eTag = jqXHR.getResponseHeader("ETag");
-                _cachedETags[path] = new ETagResponse(eTag, data, jqXHR.status);
-              }
-              return resolve(data, jqXHR.status, jqXHR);
-            }
-          });
-          onError = /* @__PURE__ */ __name(function(jqXHR) {
-            var err2, json;
-            always(jqXHR);
-            if (options.isBoolean && 404 === jqXHR.status) {
-              return resolve(false);
-            } else {
-              if (jqXHR.getResponseHeader("Content-Type") !== "application/json; charset=utf-8") {
-                err2 = new Error(jqXHR.responseText);
-                err2["status"] = jqXHR.status;
-                err2["__jqXHR"] = jqXHR;
-                return reject(err2);
-              } else {
-                err2 = new Error("Github error: " + jqXHR.responseText);
-                if (jqXHR.responseText) {
-                  json = JSON.parse(jqXHR.responseText);
-                } else {
-                  json = "";
-                }
-                err2["error"] = json;
-                err2["status"] = jqXHR.status;
-                err2["__jqXHR"] = jqXHR;
-                return reject(err2);
-              }
-            }
-          }, "onError");
-          return (typeof xhrPromise["catch"] === "function" ? xhrPromise["catch"](onError) : void 0) || xhrPromise.fail(onError);
-        });
-        notifyStart(promise, path);
-        return promise;
-      }, "_request");
-      toQueryString = /* @__PURE__ */ __name(function(options) {
-        var params;
-        if (_.isEmpty(options)) {
-          return "";
-        }
-        params = [];
-        _.each(_.pairs(options), function(_arg) {
-          var key, value;
-          key = _arg[0], value = _arg[1];
-          return params.push("" + key + "=" + encodeURIComponent(value));
-        });
-        return "?" + params.join("&");
-      }, "toQueryString");
-      this.clearCache = clearCache = /* @__PURE__ */ __name(function() {
-        return _cachedETags = {};
-      }, "clearCache");
-      this.getCache = getCache = /* @__PURE__ */ __name(function() {
-        return _cachedETags;
-      }, "getCache");
-      this.setCache = setCache = /* @__PURE__ */ __name(function(cachedETags) {
-        if (!(cachedETags !== null && typeof cachedETags === "object")) {
-          throw new Error(
-            'BUG: argument of method "setCache" should be an object'
-          );
-        } else {
-          return _cachedETags = cachedETags;
-        }
-      }, "setCache");
-      this.onRateLimitChanged = function(listener) {
-        return _listeners.push(listener);
-      };
-      this.getZen = function() {
-        return _request("GET", "/zen", null, {
-          raw: true
-        });
-      };
-      this.getAllUsers = function(since) {
-        var options;
-        if (since == null) {
-          since = null;
-        }
-        options = {};
-        if (since) {
-          options.since = since;
-        }
-        return _request("GET", "/users", options);
-      };
-      this.getOrgRepos = function(orgName, type) {
-        if (type == null) {
-          type = "all";
-        }
-        return _request(
-          "GET",
-          "/orgs/" + orgName + "/repos?type=" + type + "&per_page=1000&sort=updated&direction=desc",
-          null
-        );
-      };
-      this.getPublicGists = function(since) {
-        var getDate, options;
-        if (since == null) {
-          since = null;
-        }
-        options = null;
-        getDate = /* @__PURE__ */ __name(function(time) {
-          if (Date === time.constructor) {
-            return time.toISOString();
-          }
-          return time;
-        }, "getDate");
-        if (since) {
-          options = {
-            since: getDate(since)
-          };
-        }
-        return _request("GET", "/gists/public", options);
-      };
-      this.getPublicEvents = function() {
-        return _request("GET", "/events", null);
-      };
-      this.getNotifications = function(options) {
-        var getDate, queryString;
-        if (options == null) {
-          options = {};
-        }
-        getDate = /* @__PURE__ */ __name(function(time) {
-          if (Date === time.constructor) {
-            return time.toISOString();
-          }
-          return time;
-        }, "getDate");
-        if (options.since) {
-          options.since = getDate(options.since);
-        }
-        queryString = toQueryString(options);
-        return _request("GET", "/notifications" + queryString, null);
-      };
-      User = /* @__PURE__ */ function() {
-        function User2(_username) {
-          var _cachedInfo, _rootPath;
-          if (_username == null) {
-            _username = null;
-          }
-          if (_username) {
-            _rootPath = "/users/" + _username;
-          } else {
-            _rootPath = "/user";
-          }
-          _cachedInfo = null;
-          this.getInfo = function(force) {
-            if (force == null) {
-              force = false;
-            }
-            if (force) {
-              _cachedInfo = null;
-            }
-            if (_cachedInfo) {
-              return resolvedPromise(_cachedInfo);
-            }
-            return _request("GET", "" + _rootPath, null).then(function(info) {
-              return _cachedInfo = info;
-            });
-          };
-          this.getRepos = function(type, sort, direction) {
-            if (type == null) {
-              type = "all";
-            }
-            if (sort == null) {
-              sort = "pushed";
-            }
-            if (direction == null) {
-              direction = "desc";
-            }
-            return _request(
-              "GET",
-              "" + _rootPath + "/repos?type=" + type + "&per_page=1000&sort=" + sort + "&direction=" + direction,
-              null
-            );
-          };
-          this.getOrgs = function() {
-            return _request("GET", "" + _rootPath + "/orgs", null);
-          };
-          this.getGists = function() {
-            return _request("GET", "" + _rootPath + "/gists", null);
-          };
-          this.getFollowers = function() {
-            return _request("GET", "" + _rootPath + "/followers", null);
-          };
-          this.getFollowing = function() {
-            return _request("GET", "" + _rootPath + "/following", null);
-          };
-          this.isFollowing = function(user) {
-            return _request(
-              "GET",
-              "" + _rootPath + "/following/" + user,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.getPublicKeys = function() {
-            return _request("GET", "" + _rootPath + "/keys", null);
-          };
-          this.getReceivedEvents = function(onlyPublic) {
-            var isPublic;
-            if (!_username) {
-              throw new Error(
-                "BUG: This does not work for authenticated users yet!"
-              );
-            }
-            isPublic = "";
-            if (onlyPublic) {
-              isPublic = "/public";
-            }
-            return _request(
-              "GET",
-              "/users/" + _username + "/received_events" + isPublic,
-              null
-            );
-          };
-          this.getEvents = function(onlyPublic) {
-            var isPublic;
-            if (!_username) {
-              throw new Error(
-                "BUG: This does not work for authenticated users yet!"
-              );
-            }
-            isPublic = "";
-            if (onlyPublic) {
-              isPublic = "/public";
-            }
-            return _request(
-              "GET",
-              "/users/" + _username + "/events" + isPublic,
-              null
-            );
-          };
-        }
-        __name(User2, "User");
-        return User2;
-      }();
-      AuthenticatedUser = function(_super) {
-        __extends(AuthenticatedUser2, _super);
-        function AuthenticatedUser2() {
-          AuthenticatedUser2.__super__.constructor.call(this);
-          this.updateInfo = function(options) {
-            return _request("PATCH", "/user", options);
-          };
-          this.getGists = function() {
-            return _request("GET", "/gists", null);
-          };
-          this.follow = function(username) {
-            return _request("PUT", "/user/following/" + username, null);
-          };
-          this.unfollow = function(username) {
-            return _request("DELETE", "/user/following/" + username, null);
-          };
-          this.getEmails = function() {
-            return _request("GET", "/user/emails", null);
-          };
-          this.addEmail = function(emails) {
-            if (!_.isArray(emails)) {
-              emails = [emails];
-            }
-            return _request("POST", "/user/emails", emails);
-          };
-          this.addEmail = function(emails) {
-            if (!_.isArray(emails)) {
-              emails = [emails];
-            }
-            return _request("DELETE", "/user/emails", emails);
-          };
-          this.getPublicKey = function(id2) {
-            return _request("GET", "/user/keys/" + id2, null);
-          };
-          this.addPublicKey = function(title, key) {
-            return _request("POST", "/user/keys", {
-              title,
-              key
-            });
-          };
-          this.updatePublicKey = function(id2, options) {
-            return _request("PATCH", "/user/keys/" + id2, options);
-          };
-          this.createRepo = function(name, options) {
-            if (options == null) {
-              options = {};
-            }
-            options.name = name;
-            return _request("POST", "/user/repos", options);
-          };
-          this.getReceivedEvents = function(username, page) {
-            var currentPage;
-            if (page == null) {
-              page = 1;
-            }
-            currentPage = "?page=" + page;
-            return _request(
-              "GET",
-              "/users/" + username + "/received_events" + currentPage,
-              null
-            );
-          };
-          this.getStars = function() {
-            return _request("GET", "/user/starred");
-          };
-          this.putStar = function(owner, repo) {
-            return _request("PUT", "/user/starred/" + owner + "/" + repo);
-          };
-          this.deleteStar = function(owner, repo) {
-            return _request("DELETE", "/user/starred/" + owner + "/" + repo);
-          };
-        }
-        __name(AuthenticatedUser2, "AuthenticatedUser");
-        return AuthenticatedUser2;
-      }(User);
-      Team = /* @__PURE__ */ function() {
-        function Team2(id2) {
-          this.id = id2;
-          this.getInfo = function() {
-            return _request("GET", "/teams/" + this.id, null);
-          };
-          this.updateTeam = function(options) {
-            return _request("PATCH", "/teams/" + this.id, options);
-          };
-          this.remove = function() {
-            return _request("DELETE", "/teams/" + this.id);
-          };
-          this.getMembers = function() {
-            return _request("GET", "/teams/" + this.id + "/members");
-          };
-          this.isMember = function(user) {
-            return _request(
-              "GET",
-              "/teams/" + this.id + "/members/" + user,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.addMember = function(user) {
-            return _request("PUT", "/teams/" + this.id + "/members/" + user);
-          };
-          this.removeMember = function(user) {
-            return _request("DELETE", "/teams/" + this.id + "/members/" + user);
-          };
-          this.getRepos = function() {
-            return _request("GET", "/teams/" + this.id + "/repos");
-          };
-          this.addRepo = function(orgName, repoName) {
-            return _request(
-              "PUT",
-              "/teams/" + this.id + "/repos/" + orgName + "/" + repoName
-            );
-          };
-          this.removeRepo = function(orgName, repoName) {
-            return _request(
-              "DELETE",
-              "/teams/" + this.id + "/repos/" + orgName + "/" + repoName
-            );
-          };
-        }
-        __name(Team2, "Team");
-        return Team2;
-      }();
-      Organization = /* @__PURE__ */ function() {
-        function Organization2(name) {
-          this.name = name;
-          this.getInfo = function() {
-            return _request("GET", "/orgs/" + this.name, null);
-          };
-          this.updateInfo = function(options) {
-            return _request("PATCH", "/orgs/" + this.name, options);
-          };
-          this.getTeams = function() {
-            return _request("GET", "/orgs/" + this.name + "/teams", null);
-          };
-          this.createTeam = function(name2, repoNames, permission) {
-            var options;
-            if (repoNames == null) {
-              repoNames = null;
-            }
-            if (permission == null) {
-              permission = "pull";
-            }
-            options = {
-              name: name2,
-              permission
-            };
-            if (repoNames) {
-              options.repo_names = repoNames;
-            }
-            return _request("POST", "/orgs/" + this.name + "/teams", options);
-          };
-          this.getMembers = function() {
-            return _request("GET", "/orgs/" + this.name + "/members", null);
-          };
-          this.isMember = function(user) {
-            return _request(
-              "GET",
-              "/orgs/" + this.name + "/members/" + user,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.removeMember = function(user) {
-            return _request(
-              "DELETE",
-              "/orgs/" + this.name + "/members/" + user,
-              null
-            );
-          };
-          this.createRepo = function(name2, options) {
-            if (options == null) {
-              options = {};
-            }
-            options.name = name2;
-            return _request("POST", "/orgs/" + this.name + "/repos", options);
-          };
-          this.getRepos = function() {
-            return _request(
-              "GET",
-              "/orgs/" + this.name + "/repos?type=all",
-              null
-            );
-          };
-        }
-        __name(Organization2, "Organization");
-        return Organization2;
-      }();
-      GitRepo = /* @__PURE__ */ function() {
-        function GitRepo2(repoUser, repoName) {
-          var _repoPath;
-          this.repoUser = repoUser;
-          this.repoName = repoName;
-          _repoPath = "/repos/" + this.repoUser + "/" + this.repoName;
-          this.deleteRepo = function() {
-            return _request("DELETE", "" + _repoPath);
-          };
-          this._updateTree = function(branch) {
-            return this.getRef("heads/" + branch);
-          };
-          this.getRef = function(ref) {
-            var _this2 = this;
-            return _request(
-              "GET",
-              "" + _repoPath + "/git/refs/" + ref,
-              null
-            ).then(function(res) {
-              return res.object.sha;
-            });
-          };
-          this.createRef = function(options) {
-            return _request("POST", "" + _repoPath + "/git/refs", options);
-          };
-          this.deleteRef = function(ref) {
-            return _request(
-              "DELETE",
-              "" + _repoPath + "/git/refs/" + ref,
-              this.options
-            );
-          };
-          this.getBranches = function() {
-            var _this2 = this;
-            return _request(
-              "GET",
-              "" + _repoPath + "/git/refs/heads",
-              null
-            ).then(function(heads) {
-              return _.map(heads, function(head) {
-                return _.last(head.ref.split("/"));
-              });
-            });
-          };
-          this.getBlob = function(sha, isBase64) {
-            return _request("GET", "" + _repoPath + "/git/blobs/" + sha, null, {
-              raw: true,
-              isBase64
-            });
-          };
-          this.getSha = function(branch, path) {
-            var _this2 = this;
-            if (path === "") {
-              return this.getRef("heads/" + branch);
-            }
-            return this.getTree(branch, {
-              recursive: true
-            }).then(function(tree) {
-              var file;
-              file = _.select(tree, function(file2) {
-                return file2.path === path;
-              })[0];
-              if (file != null ? file.sha : void 0) {
-                return file != null ? file.sha : void 0;
-              }
-              return rejectedPromise({
-                message: "SHA_NOT_FOUND"
-              });
-            });
-          };
-          this.getContents = function(path, sha) {
-            var queryString, _this2 = this;
-            if (sha == null) {
-              sha = null;
-            }
-            queryString = "";
-            if (sha !== null) {
-              queryString = toQueryString({
-                ref: sha
-              });
-            }
-            return _request(
-              "GET",
-              "" + _repoPath + "/contents/" + path + queryString,
-              null,
-              {
-                raw: true
-              }
-            ).then(function(contents) {
-              return contents;
-            });
-          };
-          this.removeFile = function(path, message, sha, branch) {
-            var params;
-            params = {
-              message,
-              sha,
-              branch
-            };
-            return _request(
-              "DELETE",
-              "" + _repoPath + "/contents/" + path,
-              params,
-              null
-            );
-          };
-          this.getTree = function(tree, options) {
-            var queryString, _this2 = this;
-            if (options == null) {
-              options = null;
-            }
-            queryString = toQueryString(options);
-            return _request(
-              "GET",
-              "" + _repoPath + "/git/trees/" + tree + queryString,
-              null
-            ).then(function(res) {
-              return res.tree;
-            });
-          };
-          this.postBlob = function(content, isBase64) {
-            var _this2 = this;
-            if (typeof content === "string") {
-              if (isBase64) {
-                content = base64encode(content);
-              }
-              content = {
-                content,
-                encoding: "utf-8"
-              };
-            }
-            if (isBase64) {
-              content.encoding = "base64";
-            }
-            return _request(
-              "POST",
-              "" + _repoPath + "/git/blobs",
-              content
-            ).then(function(res) {
-              return res.sha;
-            });
-          };
-          this.updateTreeMany = function(baseTree, newTree) {
-            var data, _this2 = this;
-            data = {
-              base_tree: baseTree,
-              tree: newTree
-            };
-            return _request("POST", "" + _repoPath + "/git/trees", data).then(
-              function(res) {
-                return res.sha;
-              }
-            );
-          };
-          this.postTree = function(tree) {
-            var _this2 = this;
-            return _request("POST", "" + _repoPath + "/git/trees", {
-              tree
-            }).then(function(res) {
-              return res.sha;
-            });
-          };
-          this.commit = function(parents, tree, message) {
-            var data;
-            if (!_.isArray(parents)) {
-              parents = [parents];
-            }
-            data = {
-              message,
-              parents,
-              tree
-            };
-            return _request("POST", "" + _repoPath + "/git/commits", data).then(
-              function(commit) {
-                return commit.sha;
-              }
-            );
-          };
-          this.updateHead = function(head, commit, force) {
-            var options;
-            if (force == null) {
-              force = false;
-            }
-            options = {
-              sha: commit
-            };
-            if (force) {
-              options.force = true;
-            }
-            return _request(
-              "PATCH",
-              "" + _repoPath + "/git/refs/heads/" + head,
-              options
-            );
-          };
-          this.getCommit = function(sha) {
-            return _request("GET", "" + _repoPath + "/commits/" + sha, null);
-          };
-          this.getCommits = function(options) {
-            var getDate, queryString;
-            if (options == null) {
-              options = {};
-            }
-            options = _.extend({}, options);
-            getDate = /* @__PURE__ */ __name(function(time) {
-              if (Date === time.constructor) {
-                return time.toISOString();
-              }
-              return time;
-            }, "getDate");
-            if (options.since) {
-              options.since = getDate(options.since);
-            }
-            if (options.until) {
-              options.until = getDate(options.until);
-            }
-            queryString = toQueryString(options);
-            return _request(
-              "GET",
-              "" + _repoPath + "/commits" + queryString,
-              null
-            );
-          };
-        }
-        __name(GitRepo2, "GitRepo");
-        return GitRepo2;
-      }();
-      Branch = /* @__PURE__ */ function() {
-        function Branch2(git, getRef) {
-          var _getRef, _git;
-          _git = git;
-          _getRef = getRef || function() {
-            throw new Error("BUG: No way to fetch branch ref!");
-          };
-          this.getCommit = function(sha) {
-            return _git.getCommit(sha);
-          };
-          this.getCommits = function(options) {
-            if (options == null) {
-              options = {};
-            }
-            options = _.extend({}, options);
-            return _getRef().then(function(branch) {
-              options.sha = branch;
-              return _git.getCommits(options);
-            });
-          };
-          this.createBranch = function(newBranchName) {
-            var _this2 = this;
-            return _getRef().then(function(branch) {
-              return _git.getSha(branch, "").then(function(sha) {
-                return _git.createRef({
-                  sha,
-                  ref: "refs/heads/" + newBranchName
-                });
-              });
-            });
-          };
-          this.read = function(path, isBase64) {
-            var _this2 = this;
-            return _getRef().then(function(branch) {
-              return _git.getSha(branch, path).then(function(sha) {
-                return _git.getBlob(sha, isBase64).then(function(bytes) {
-                  return {
-                    sha,
-                    content: bytes
-                  };
-                });
-              });
-            });
-          };
-          this.contents = function(path) {
-            var _this2 = this;
-            return _getRef().then(function(branch) {
-              return _git.getSha(branch, "").then(function(sha) {
-                return _git.getContents(path, sha).then(function(contents) {
-                  return contents;
-                });
-              });
-            });
-          };
-          this.remove = function(path, message, sha) {
-            var _this2 = this;
-            if (message == null) {
-              message = "Removed " + path;
-            }
-            if (sha == null) {
-              sha = null;
-            }
-            return _getRef().then(function(branch) {
-              if (sha) {
-                return _git.removeFile(path, message, sha, branch);
-              } else {
-                return _git.getSha(branch, path).then(function(sha2) {
-                  return _git.removeFile(path, message, sha2, branch);
-                });
-              }
-            });
-          };
-          this.move = function(path, newPath, message) {
-            var _this2 = this;
-            if (message == null) {
-              message = "Moved " + path;
-            }
-            return _getRef().then(function(branch) {
-              return _git._updateTree(branch).then(function(latestCommit) {
-                return _git.getTree(latestCommit, {
-                  recursive: true
-                }).then(function(tree) {
-                  _.each(tree, function(ref) {
-                    if (ref.path === path) {
-                      ref.path = newPath;
-                    }
-                    if (ref.type === "tree") {
-                      return delete ref.sha;
-                    }
-                  });
-                  return _git.postTree(tree).then(function(rootTree) {
-                    return _git.commit(latestCommit, rootTree, message).then(function(commit) {
-                      return _git.updateHead(branch, commit).then(function(res) {
-                        return res;
-                      });
-                    });
-                  });
-                });
-              });
-            });
-          };
-          this.write = function(path, content, message, isBase64, parentCommitSha) {
-            var contents;
-            if (message == null) {
-              message = "Changed " + path;
-            }
-            if (parentCommitSha == null) {
-              parentCommitSha = null;
-            }
-            contents = {};
-            contents[path] = {
-              content,
-              isBase64
-            };
-            return this.writeMany(contents, message, parentCommitSha);
-          };
-          this.writeMany = function(contents, message, parentCommitShas) {
-            var _this2 = this;
-            if (message == null) {
-              message = "Changed Multiple";
-            }
-            if (parentCommitShas == null) {
-              parentCommitShas = null;
-            }
-            return _getRef().then(function(branch) {
-              var afterParentCommitShas;
-              afterParentCommitShas = /* @__PURE__ */ __name(function(parentCommitShas2) {
-                var promises;
-                promises = _.map(_.pairs(contents), function(_arg) {
-                  var content, data, isBase64, path, _this3 = this;
-                  path = _arg[0], data = _arg[1];
-                  content = data.content || data;
-                  isBase64 = data.isBase64 || false;
-                  return _git.postBlob(content, isBase64).then(function(blob) {
-                    return {
-                      path,
-                      mode: "100644",
-                      type: "blob",
-                      sha: blob
-                    };
-                  });
-                });
-                return allPromises2(promises).then(function(newTrees) {
-                  return _git.updateTreeMany(parentCommitShas2, newTrees).then(function(tree) {
-                    return _git.commit(parentCommitShas2, tree, message).then(function(commitSha) {
-                      return _git.updateHead(branch, commitSha).then(function(res) {
-                        return res.object;
-                      });
-                    });
-                  });
-                });
-              }, "afterParentCommitShas");
-              if (parentCommitShas) {
-                return afterParentCommitShas(parentCommitShas);
-              } else {
-                return _git._updateTree(branch).then(afterParentCommitShas);
-              }
-            });
-          };
-        }
-        __name(Branch2, "Branch");
-        return Branch2;
-      }();
-      Repository = /* @__PURE__ */ function() {
-        function Repository2(options) {
-          var _repo, _user;
-          this.options = options;
-          _user = this.options.user;
-          _repo = this.options.name;
-          this.git = new GitRepo(_user, _repo);
-          this.repoPath = "/repos/" + _user + "/" + _repo;
-          this.currentTree = {
-            branch: null,
-            sha: null
-          };
-          this.updateInfo = function(options2) {
-            return _request("PATCH", this.repoPath, options2);
-          };
-          this.getBranches = function() {
-            return this.git.getBranches();
-          };
-          this.getBranch = function(branchName) {
-            var getRef, _this2 = this;
-            if (branchName == null) {
-              branchName = null;
-            }
-            if (branchName) {
-              getRef = /* @__PURE__ */ __name(function() {
-                return resolvedPromise(branchName);
-              }, "getRef");
-              return new Branch(this.git, getRef);
-            } else {
-              return this.getDefaultBranch();
-            }
-          };
-          this.getDefaultBranch = function() {
-            var getRef, _this2 = this;
-            getRef = /* @__PURE__ */ __name(function() {
-              return _this2.getInfo().then(function(info) {
-                return info.default_branch;
-              });
-            }, "getRef");
-            return new Branch(this.git, getRef);
-          };
-          this.setDefaultBranch = function(branchName) {
-            return this.updateInfo({
-              name: _repo,
-              default_branch: branchName
-            });
-          };
-          this.getInfo = function() {
-            return _request("GET", this.repoPath, null);
-          };
-          this.getContents = function(branch, path) {
-            return _request(
-              "GET",
-              "" + this.repoPath + "/contents?ref=" + branch,
-              {
-                path
-              }
-            );
-          };
-          this.fork = function(organization) {
-            if (organization) {
-              return _request("POST", "" + this.repoPath + "/forks", {
-                organization
-              });
-            } else {
-              return _request("POST", "" + this.repoPath + "/forks", null);
-            }
-          };
-          this.createPullRequest = function(options2) {
-            return _request("POST", "" + this.repoPath + "/pulls", options2);
-          };
-          this.getCommits = function(options2) {
-            return this.git.getCommits(options2);
-          };
-          this.getEvents = function() {
-            return _request("GET", "" + this.repoPath + "/events", null);
-          };
-          this.getIssueEvents = function() {
-            return _request("GET", "" + this.repoPath + "/issues/events", null);
-          };
-          this.getNetworkEvents = function() {
-            return _request(
-              "GET",
-              "/networks/" + _user + "/" + _repo + "/events",
-              null
-            );
-          };
-          this.getNotifications = function(options2) {
-            var getDate, queryString;
-            if (options2 == null) {
-              options2 = {};
-            }
-            getDate = /* @__PURE__ */ __name(function(time) {
-              if (Date === time.constructor) {
-                return time.toISOString();
-              }
-              return time;
-            }, "getDate");
-            if (options2.since) {
-              options2.since = getDate(options2.since);
-            }
-            queryString = toQueryString(options2);
-            return _request(
-              "GET",
-              "" + this.repoPath + "/notifications" + queryString,
-              null
-            );
-          };
-          this.getCollaborators = function() {
-            return _request("GET", "" + this.repoPath + "/collaborators", null);
-          };
-          this.addCollaborator = function(username) {
-            if (!username) {
-              throw new Error("BUG: username is required");
-            }
-            return _request(
-              "PUT",
-              "" + this.repoPath + "/collaborators/" + username,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.removeCollaborator = function(username) {
-            if (!username) {
-              throw new Error("BUG: username is required");
-            }
-            return _request(
-              "DELETE",
-              "" + this.repoPath + "/collaborators/" + username,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.isCollaborator = function(username) {
-            if (username == null) {
-              username = null;
-            }
-            if (!username) {
-              throw new Error("BUG: username is required");
-            }
-            return _request(
-              "GET",
-              "" + this.repoPath + "/collaborators/" + username,
-              null,
-              {
-                isBoolean: true
-              }
-            );
-          };
-          this.canCollaborate = function() {
-            var _this2 = this;
-            if (!(clientOptions.password || clientOptions.token)) {
-              return resolvedPromise(false);
-            }
-            return _client.getLogin().then(function(login) {
-              if (!login) {
-                return false;
-              } else {
-                return _this2.isCollaborator(login);
-              }
-            }).then(null, function(err2) {
-              return false;
-            });
-          };
-          this.getHooks = function() {
-            return _request("GET", "" + this.repoPath + "/hooks", null);
-          };
-          this.getHook = function(id2) {
-            return _request("GET", "" + this.repoPath + "/hooks/" + id2, null);
-          };
-          this.createHook = function(name, config, events, active) {
-            var data;
-            if (events == null) {
-              events = ["push"];
-            }
-            if (active == null) {
-              active = true;
-            }
-            data = {
-              name,
-              config,
-              events,
-              active
-            };
-            return _request("POST", "" + this.repoPath + "/hooks", data);
-          };
-          this.editHook = function(id2, config, events, addEvents, removeEvents, active) {
-            var data;
-            if (config == null) {
-              config = null;
-            }
-            if (events == null) {
-              events = null;
-            }
-            if (addEvents == null) {
-              addEvents = null;
-            }
-            if (removeEvents == null) {
-              removeEvents = null;
-            }
-            if (active == null) {
-              active = null;
-            }
-            data = {};
-            if (config !== null) {
-              data.config = config;
-            }
-            if (events !== null) {
-              data.events = events;
-            }
-            if (addEvents !== null) {
-              data.add_events = addEvents;
-            }
-            if (removeEvents !== null) {
-              data.remove_events = removeEvents;
-            }
-            if (active !== null) {
-              data.active = active;
-            }
-            return _request("PATCH", "" + this.repoPath + "/hooks/" + id2, data);
-          };
-          this.testHook = function(id2) {
-            return _request(
-              "POST",
-              "" + this.repoPath + "/hooks/" + id2 + "/tests",
-              null
-            );
-          };
-          this.deleteHook = function(id2) {
-            return _request(
-              "DELETE",
-              "" + this.repoPath + "/hooks/" + id2,
-              null
-            );
-          };
-          this.getLanguages = function() {
-            return _request("GET", "" + this.repoPath + "/languages", null);
-          };
-          this.getReleases = function() {
-            return _request("GET", "" + this.repoPath + "/releases", null);
-          };
-        }
-        __name(Repository2, "Repository");
-        return Repository2;
-      }();
-      Gist = /* @__PURE__ */ function() {
-        function Gist2(options) {
-          var id2, _gistPath;
-          this.options = options;
-          id2 = this.options.id;
-          _gistPath = "/gists/" + id2;
-          this.read = function() {
-            return _request("GET", _gistPath, null);
-          };
-          this.create = function(files, isPublic, description) {
-            if (isPublic == null) {
-              isPublic = false;
-            }
-            if (description == null) {
-              description = null;
-            }
-            options = {
-              isPublic,
-              files
-            };
-            if (description != null) {
-              options.description = description;
-            }
-            return _request("POST", "/gists", options);
-          };
-          this["delete"] = function() {
-            return _request("DELETE", _gistPath, null);
-          };
-          this.fork = function() {
-            return _request("POST", "" + _gistPath + "/forks", null);
-          };
-          this.update = function(files, description) {
-            if (description == null) {
-              description = null;
-            }
-            options = {
-              files
-            };
-            if (description != null) {
-              options.description = description;
-            }
-            return _request("PATCH", _gistPath, options);
-          };
-          this.star = function() {
-            return _request("PUT", "" + _gistPath + "/star");
-          };
-          this.unstar = function() {
-            return _request("DELETE", "" + _gistPath + "/star");
-          };
-          this.isStarred = function() {
-            return _request("GET", "" + _gistPath, null, {
-              isBoolean: true
-            });
-          };
-        }
-        __name(Gist2, "Gist");
-        return Gist2;
-      }();
-      this.getRepo = function(user, repo) {
-        if (!user) {
-          throw new Error("BUG! user argument is required");
-        }
-        if (!repo) {
-          throw new Error("BUG! repo argument is required");
-        }
-        return new Repository({
-          user,
-          name: repo
-        });
-      };
-      this.getOrg = function(name) {
-        return new Organization(name);
-      };
-      this.getUser = function(login) {
-        if (login == null) {
-          login = null;
-        }
-        if (login) {
-          return new User(login);
-        } else if (clientOptions.password || clientOptions.token) {
-          return new AuthenticatedUser();
-        } else {
-          return null;
-        }
-      };
-      this.getGist = function(id2) {
-        return new Gist({
-          id: id2
-        });
-      };
-      this.getLogin = function() {
-        if (clientOptions.password || clientOptions.token) {
-          return new User().getInfo().then(function(info) {
-            return info.login;
-          });
-        } else {
-          return resolvedPromise(null);
-        }
-      };
-    }
-    __name(Octokit3, "Octokit");
-    return Octokit3;
-  }();
-  return Octokit2;
-}, "makeOctokit");
-newPromise = /* @__PURE__ */ __name(function(fn) {
-  return new Promise(fn);
-}, "newPromise");
-allPromises = /* @__PURE__ */ __name(function(promises) {
-  return Promise.all.call(Promise, promises);
-}, "allPromises");
-Octokit = makeOctokit(newPromise, allPromises, XMLHttpRequest, btoa, "octokit");
-var octokit_default = Octokit;
-
 // lib/connector.js
+import { Octokit } from "https://esm.sh/@octokit/core";
 var Connector = class {
   static {
     __name(this, "Connector");
   }
-  constructor(options) {
-    if (options && options.token && options.token.trim()) {
-      this.options = options;
-      this.setProperties(options);
+  constructor(options2) {
+    if (options2 && options2.token && options2.token.trim()) {
+      this.options = options2;
+      this.setProperties(options2);
     } else {
       this.options = {
         path: "gh-weblog"
       };
     }
   }
-  setProperties(options) {
-    this.path = options.path;
-    this.repo = new octokit_default({ token: options.token }).getRepo(
-      options.user,
-      options.repo
-    );
-    this.branch = this.repo.getBranch(options.branch);
+  setProperties(options2) {
+    this.path = options2.path;
+    this.octokit = new Octokit({ auth: options2.token });
   }
   async get(url) {
     const type = url.endsWith(`.json`) ? `json` : `text`;
@@ -9038,39 +7537,74 @@ var Connector = class {
     throw new Error(result.status);
   }
   async loadIndex() {
-    return await this.get(`${this.options.path}/content/posts/index.json`);
+    return await this.get(`${this.path}/content/posts/index.json`);
   }
   async loadMetaData(id2) {
-    return this.get(`${this.options.path}/content/posts/metadata/${id2}.json`);
+    return this.get(`${this.path}/content/posts/metadata/${id2}.json`);
   }
   async loadPostData(id2) {
-    return this.get(`${this.options.path}/content/posts/markdown/${id2}.md`);
+    return this.get(`${this.path}/content/posts/markdown/${id2}.md`);
   }
-  saveEntry({ id: id2, metaData, postData }, index, saved) {
-    const path = `${this.options.path}/content/posts/`;
+  // -----------------------------------------------------------
+  async getCurrentSha() {
+    const { octokit, user, repo, branch, path } = options;
+    return (await octokit.request(`GET /repos/${user}/${repo}commits/${branch}`)).data.sha;
+  }
+  async makeBlob(data) {
+    const { user, repo } = this.options;
+    const blobData = await this.octokit.git.createBlob({
+      owner: user,
+      repo,
+      data,
+      encoding: "utf-8"
+    });
+    return blobData.data;
+  }
+  async saveEntry({ id: id2, metaData, postData }, index, saved) {
+    const { options: options2, octokit } = this;
+    const { user, repo, branch } = options2;
+    const path = `${this.path}/content/posts/`;
     const commitMessage = `Saving new entry ${id2}`;
     const content = {};
     const indexData = JSON.stringify(index, false, 2);
     const indexFilename = `${path}index.json`;
-    content[indexFilename] = indexData;
+    content[indexFilename] = await this.makeBlob(indexData);
     metaData = JSON.stringify(metaData, false, 2);
     const metaDataFilename = `${path}metadata/${id2}.json`;
-    content[metaDataFilename] = metaData;
+    content[metaDataFilename] = await this.makeBlob(metaData);
     const postDataFilename = `${path}markdown/${id2}.md`;
-    content[postDataFilename] = postData;
-    try {
-      this.branch.writeMany(content, commitMessage).then(function() {
-        console.log(`Saved entry ${id2} to github.`);
-        if (saved) saved(entry);
-      });
-    } catch (e) {
-      console.error(`saving went horribly wrong`);
-      throw e;
-    }
+    content[postDataFilename] = await this.makeBlob(postData);
+    const paths = Object.keys(content);
+    const blobs = Object.values(content);
+    const currentSha = this.getCurrentSha();
+    const { data: newTree } = await octokit.git.createTree({
+      owner: user,
+      repo,
+      tree: blobs.map(({ sha }, index2) => ({
+        path: paths[index2],
+        mode: `100644`,
+        type: `blob`,
+        sha
+      })),
+      base_tree: currentSha
+    });
+    const { data: newCommit } = await octokit.git.createCommit({
+      owner: user,
+      repo,
+      message: commitMessage,
+      tree: newTree.sha,
+      parents: [currentSha]
+    });
+    octokit.git.updateRef({
+      owner: user,
+      repo,
+      ref: `heads/${branch}`,
+      sha: newCommit.sha
+    });
   }
   deleteEntry(entry2, index, deleted) {
     const id2 = entry2.state.id;
-    const path = `${this.options.path}/content/posts/`;
+    const path = `${this.path}/content/posts/`;
     const commitMessage = `Removing entry ${id2}`;
     const indexData = JSON.stringify({ index: index.sort() }, false, 2);
     const indexFilename = `${path}index.json`;
@@ -9093,7 +7627,7 @@ var Connector = class {
       category = false;
     }
     category = category ? `${category}-` : ``;
-    const rssFilename = `${this.options.path}/${category}rss.xml`;
+    const rssFilename = `${this.path}/${category}rss.xml`;
     const commitMessage = `Update to RSS XML`;
     try {
       this.branch.write(rssFilename, rss, commitMessage).then(() => {
