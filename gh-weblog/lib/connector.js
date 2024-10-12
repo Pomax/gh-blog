@@ -35,7 +35,7 @@ export default class Connector {
   }
 
   async loadMetaData(id) {
-    return this.get(`${this.options.path}/content/posts/metaData/${id}.json`);
+    return this.get(`${this.options.path}/content/posts/metadata/${id}.json`);
   }
 
   async loadPostData(id) {
@@ -52,7 +52,7 @@ export default class Connector {
     content[indexFilename] = indexData;
 
     metaData = JSON.stringify(metaData, false, 2);
-    const metaDataFilename = `${path}metaData/${id}.json`;
+    const metaDataFilename = `${path}metadata/${id}.json`;
     content[metaDataFilename] = metaData;
 
     const postDataFilename = `${path}markdown/${id}.md`;

@@ -9041,7 +9041,7 @@ var Connector = class {
     return await this.get(`${this.options.path}/content/posts/index.json`);
   }
   async loadMetaData(id2) {
-    return this.get(`${this.options.path}/content/posts/metaData/${id2}.json`);
+    return this.get(`${this.options.path}/content/posts/metadata/${id2}.json`);
   }
   async loadPostData(id2) {
     return this.get(`${this.options.path}/content/posts/markdown/${id2}.md`);
@@ -9054,7 +9054,7 @@ var Connector = class {
     const indexFilename = `${path}index.json`;
     content[indexFilename] = indexData;
     metaData = JSON.stringify(metaData, false, 2);
-    const metaDataFilename = `${path}metaData/${id2}.json`;
+    const metaDataFilename = `${path}metadata/${id2}.json`;
     content[metaDataFilename] = metaData;
     const postDataFilename = `${path}markdown/${id2}.md`;
     content[postDataFilename] = postData;
