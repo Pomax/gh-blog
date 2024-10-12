@@ -8488,13 +8488,15 @@ var Connector = class {
       this.options = options2;
       this.setProperties(options2);
     } else {
+      this.path = `gh-weblog`;
       this.options = {
-        path: "gh-weblog"
+        path: this.path
       };
     }
   }
   setProperties(options2) {
-    this.path = options2.path || `gh-weblog`;
+    this.path = options2.path;
+    console.log(`this.path =`, this.path);
     this.octokit = new Octokit({ auth: options2.token });
   }
   async get(url) {

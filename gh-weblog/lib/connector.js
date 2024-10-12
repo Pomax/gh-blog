@@ -7,14 +7,16 @@ export default class Connector {
       this.options = options;
       this.setProperties(options);
     } else {
+      this.path = `gh-weblog`;
       this.options = {
-        path: "gh-weblog",
+        path: this.path,
       };
     }
   }
 
   setProperties(options) {
-    this.path = options.path || `gh-weblog`;
+    this.path = options.path;
+    console.log(`this.path =`, this.path);
     this.octokit = new Octokit({ auth: options.token });
   }
 
