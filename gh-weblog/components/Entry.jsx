@@ -45,7 +45,7 @@ export default createClass({
         {deleteButton}
         <header>
           <h1>
-            <a href={`posts/${state.published}/${title}`}>{state.title}</a>
+            <a href={`pages/${state.published}/${title}`}>{state.title}</a>
           </h1>
           <h2>
             Originally posted on {posted}, last updated on {updated}

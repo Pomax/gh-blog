@@ -7444,7 +7444,7 @@ var Entry_default = createClass({
     }
     const posted = new Date(state.published).toLocaleString();
     const updated = new Date(state.updated).toLocaleString();
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.published}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `posts/${state.published}/${title2}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.published}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `pages/${state.published}/${title2}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
       MarkDown_default,
       {
         ref: "markdown",
@@ -8711,7 +8711,7 @@ var Connector = class {
       },
       {
         message: `Saving static redirect page`,
-        path: `posts/${published}/${utils_default.titleReplace(title2)}/index.html`,
+        path: `pages/${published}/${utils_default.titleReplace(title2)}/index.html`,
         content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${published}">`
       }
     ];
@@ -8737,7 +8737,7 @@ var Connector = class {
       },
       {
         message: `Deleting static redirect page`,
-        path: `posts/${published}/${utils_default.titleReplace(title2)}/index.html`
+        path: `pages/${published}/${utils_default.titleReplace(title2)}/index.html`
       }
     ];
     await this.processCommit(files);
@@ -8849,7 +8849,7 @@ var WebLog_default = createClass({
         return false;
       }
       var title2 = utils_default.titleReplace(entry.metaData.title);
-      var vanityURL = ["/posts/", entry.metaData.created, "/", title2].join("");
+      var vanityURL = ["/pages/", entry.metaData.created, "/", title2].join("");
       history.replaceState({}, title2, vanityURL);
     }
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { ref: "weblog", className: "gh-weblog" }, this.state.pending ? /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "pending" }, "pending...") : null, this.generateToC(), this.generateTagList(), /* @__PURE__ */ react_0_12_min_default.createElement(
@@ -8874,7 +8874,7 @@ var WebLog_default = createClass({
       return /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", { className: "year" }, date.getFullYear()), /* @__PURE__ */ react_0_12_min_default.createElement("td", { className: "when" }, when), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
         "a",
         {
-          href: `${singleton ? `../../` : ``}posts/${published}/${utils_default.titleReplace(title2)}`
+          href: `${singleton ? `../../` : ``}pages/${published}/${utils_default.titleReplace(title2)}`
         },
         title2
       )));

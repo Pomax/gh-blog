@@ -106,7 +106,7 @@ export default createClass({
         return false;
       }
       var title = utils.titleReplace(entry.metaData.title);
-      var vanityURL = ["/posts/", entry.metaData.created, "/", title].join("");
+      var vanityURL = ["/pages/", entry.metaData.created, "/", title].join("");
       history.replaceState({}, title, vanityURL);
     }
 
@@ -149,7 +149,7 @@ export default createClass({
                   <td className="when">{when}</td>
                   <td>
                     <a
-                      href={`${singleton ? `../../` : ``}posts/${published}/${utils.titleReplace(title)}`}
+                      href={`${singleton ? `../../` : ``}pages/${published}/${utils.titleReplace(title)}`}
                     >
                       {title}
                     </a>

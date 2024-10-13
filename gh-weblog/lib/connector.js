@@ -85,7 +85,7 @@ export default class Connector {
       },
       {
         message: `Saving static redirect page`,
-        path: `posts/${published}/${utils.titleReplace(title)}/index.html`,
+        path: `pages/${published}/${utils.titleReplace(title)}/index.html`,
         content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${published}">`,
       },
     ];
@@ -112,7 +112,7 @@ export default class Connector {
       },
       {
         message: `Deleting static redirect page`,
-        path: `posts/${published}/${utils.titleReplace(title)}/index.html`,
+        path: `pages/${published}/${utils.titleReplace(title)}/index.html`,
       },
     ];
     await this.processCommit(files);
