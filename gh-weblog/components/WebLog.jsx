@@ -31,9 +31,6 @@ export default createClass({
   getPostId() {
     const params = new URLSearchParams(location.search);
     const id = timeToId(params.get(`postid`));
-    if (id) {
-      this.setState({ singleton: true });
-    }
     return id;
   },
 
@@ -52,11 +49,17 @@ export default createClass({
     Object.values(index).forEach((e) =>
       e.tags?.forEach((tag) => tags.add(tag))
     );
+
+    if (id) {
+      document.querySelector(`a.home-link`).href = "../..";
+    }
+
     this.setState(
       {
-        index,
-        tags: [...tags],
         entryIds: Object.keys(index).sort().reverse(),
+        index,
+        singleton: id,
+        tags: [...tags],
       },
       () => {
         this.props.onTags?.(this.state.tags);
@@ -99,14 +102,13 @@ export default createClass({
 
   renderContent(adminButton, postButton, moreButton) {
     // ensure the URL looks "normal"
-    var entry = false;
-    if (arguments.length === 0) {
-      entry = this.getSlice()[0];
-      if (!entry) {
-        return false;
-      }
-      var title = utils.titleReplace(entry.metaData.title);
-      var vanityURL = ["/pages/", entry.metaData.published, "/", title].join("");
+    let entry = false;
+    const id = this.state.singleton;
+    if (id) {
+      entry = this.state.entries[id];
+      if (!entry) return null;
+      const title = utils.titleReplace(entry.metaData.title);
+      const vanityURL = `/pages/${entry.metaData.published}/${title}`;
       history.replaceState({}, title, vanityURL);
     }
 
@@ -123,7 +125,7 @@ export default createClass({
         />
         {adminButton}
         {postButton}
-        {this.generateEntries(entry ? [entry] : false)}
+        {this.generateEntries(entry)}
         {moreButton}
       </div>
     );
@@ -184,10 +186,12 @@ export default createClass({
     return ids.map((id) => state.entries[id]).filter(Boolean);
   },
 
-  generateEntries(entries) {
-    entries = entries || this.getSlice();
+  generateEntries(entry) {
+    const entries = entry ? [entry] : this.getSlice();
     if (!entries.length) return;
+
     const { issues, singleton, authenticated } = this.state;
+
     return (
       <main>
         {entries.map((entry) => {
@@ -265,7 +269,6 @@ export default createClass({
   },
 
   createEntry() {
-    console.log(`create entry!`);
     const date = new Date();
     const timestamp = date.getTime();
     const metaData = {

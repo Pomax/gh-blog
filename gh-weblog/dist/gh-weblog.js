@@ -8812,9 +8812,6 @@ var WebLog_default = createClass({
   getPostId() {
     const params = new URLSearchParams(location.search);
     const id2 = timeToId(params.get(`postid`));
-    if (id2) {
-      this.setState({ singleton: true });
-    }
     return id2;
   },
   setIssueTracker() {
@@ -8829,11 +8826,15 @@ var WebLog_default = createClass({
     Object.values(index).forEach(
       (e) => e.tags?.forEach((tag) => tags.add(tag))
     );
+    if (id2) {
+      document.querySelector(`a.home-link`).href = "../..";
+    }
     this.setState(
       {
+        entryIds: Object.keys(index).sort().reverse(),
         index,
-        tags: [...tags],
-        entryIds: Object.keys(index).sort().reverse()
+        singleton: id2,
+        tags: [...tags]
       },
       () => {
         this.props.onTags?.(this.state.tags);
@@ -8864,14 +8865,13 @@ var WebLog_default = createClass({
     return this.renderContent(adminButton, postButton, moreButton);
   },
   renderContent(adminButton, postButton, moreButton) {
-    var entry = false;
-    if (arguments.length === 0) {
-      entry = this.getSlice()[0];
-      if (!entry) {
-        return false;
-      }
-      var title2 = utils_default.titleReplace(entry.metaData.title);
-      var vanityURL = ["/pages/", entry.metaData.published, "/", title2].join("");
+    let entry = false;
+    const id2 = this.state.singleton;
+    if (id2) {
+      entry = this.state.entries[id2];
+      if (!entry) return null;
+      const title2 = utils_default.titleReplace(entry.metaData.title);
+      const vanityURL = `/pages/${entry.metaData.published}/${title2}`;
       history.replaceState({}, title2, vanityURL);
     }
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { ref: "weblog", className: "gh-weblog" }, this.state.pending ? /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "pending" }, "pending...") : null, this.generateToC(), this.generateTagList(), /* @__PURE__ */ react_0_12_min_default.createElement(
@@ -8882,7 +8882,7 @@ var WebLog_default = createClass({
         onClose: this.bindSettings,
         onLogout: this.onLogOut
       }
-    ), adminButton, postButton, this.generateEntries(entry ? [entry] : false), moreButton);
+    ), adminButton, postButton, this.generateEntries(entry), moreButton);
   },
   generateToC() {
     const { singleton } = this.state;
@@ -8915,20 +8915,20 @@ var WebLog_default = createClass({
     var ids = state.entryIds.slice(start, end);
     return ids.map((id2) => state.entries[id2]).filter(Boolean);
   },
-  generateEntries(entries) {
-    entries = entries || this.getSlice();
+  generateEntries(entry) {
+    const entries = entry ? [entry] : this.getSlice();
     if (!entries.length) return;
     const { issues, singleton, authenticated } = this.state;
-    return /* @__PURE__ */ react_0_12_min_default.createElement("main", null, entries.map((entry) => {
-      return entry.metaData.draft && !authenticated ? null : /* @__PURE__ */ react_0_12_min_default.createElement(
+    return /* @__PURE__ */ react_0_12_min_default.createElement("main", null, entries.map((entry2) => {
+      return entry2.metaData.draft && !authenticated ? null : /* @__PURE__ */ react_0_12_min_default.createElement(
         Entry_default,
         {
-          key: entry.metaData.id,
-          id: entry.metaData.id,
-          ref: entry.metaData.id,
+          key: entry2.metaData.id,
+          id: entry2.metaData.id,
+          ref: entry2.metaData.id,
           issues,
-          metaData: entry.metaData,
-          postData: entry.postData,
+          metaData: entry2.metaData,
+          postData: entry2.postData,
           singleton,
           editable: !singleton && authenticated,
           onSave: this.saveEntry,
@@ -8979,7 +8979,6 @@ var WebLog_default = createClass({
     }, "next"))(slice);
   },
   createEntry() {
-    console.log(`create entry!`);
     const date = /* @__PURE__ */ new Date();
     const timestamp = date.getTime();
     const metaData = {
