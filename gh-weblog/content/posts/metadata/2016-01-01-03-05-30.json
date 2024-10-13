@@ -1,0 +1,13 @@
+{
+  "id": "2016-01-01-03-05-30",
+  "title": " React with LaTeX, without needing client-side Mathjax",
+  "created": 1451617530567,
+  "published": 1451617530567,
+  "updated": 1452033020806,
+  "tags": [
+    "React",
+    "LaTeX",
+    "MathJax",
+    "Webpack"
+  ]
+}

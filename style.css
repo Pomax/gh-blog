@@ -14,7 +14,8 @@ body {
   box-shadow: 0 0 50px 5px gray;
 }
 
-body > header h1, h2 {
+body > header h1,
+h2 {
   font-family: "Eagle Lake";
   margin: 0;
 }
@@ -25,31 +26,45 @@ body > header h1 {
 
 body > header h1 .deved {
   font-family: Verdana;
-  color: #CBCBCB;
+  color: #cbcbcb;
   font-size: 65%;
   font-weight: normal;
   display: inline-block;
   height: 0.5em;
   vertical-align: 0.25em;
-  margin-left: 1em;  
+  margin-left: 1em;
 }
 
 body > header h2 {
   font-size: 110%;
   text-indent: 2em;
   margin-bottom: 1em;
-  color: #FFF2E7;
+  color: #fff2e7;
 }
 
-h1,h2,h3,h4,h5,h6 {
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
   font-family: Lustria;
 }
 
-a, a:active, a:hover, a:visited {
+a,
+a:active,
+a:hover,
+a:visited {
   text-decoration: none;
-  color: rgb(100,180,230);
+  color: rgb(100, 180, 230);
 }
 
 a:hover {
-  color: rgb(80,140,200);
+  color: rgb(80, 140, 200);
+}
+
+#gh-weblog {
+  .taglist {
+    display: none;
+  }
 }

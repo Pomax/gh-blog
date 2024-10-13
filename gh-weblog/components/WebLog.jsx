@@ -5,6 +5,7 @@ import Entry from "./Entry.jsx";
 
 import WebLogSettings from "../lib/weblogsettings.js";
 import Connector from "../lib/connector.js";
+import marked from "../lib/vendor/marked/marked.js";
 
 function timeToId(timestamp) {
   if (!timestamp) return false;
@@ -15,14 +16,6 @@ function timeToId(timestamp) {
 }
 
 export default createClass({
-  // local cache, because we don't want to load the entire
-  // index at once, and we don't want to requery for it.
-  index: [],
-
-  // local cache, because we can't be sure state won't
-  // be modified multiple times per time slice.
-  list: {},
-
   initialState: {
     singleton: false,
     entries: {},
@@ -32,20 +25,12 @@ export default createClass({
     authenticated: false,
     site: ``,
     issues: ``,
-    categories: undefined,
+    tags: undefined,
   },
 
   getPostId() {
-    // are we loading one entry, or "all" entries?
-    let fragmentId = location.hash || false;
-    if (fragmentId) {
-      if (fragmentId.indexOf(`#gh-weblog`) > -1) {
-        fragmentId = fragmentId.replace(`#gh-weblog-`, ``);
-      } else {
-        fragmentId = false;
-      }
-    }
-    const id = timeToId(fragmentId);
+    const params = new URLSearchParams(location.search);
+    const id = timeToId(params.get(`postid`));
     if (id) {
       this.setState({ singleton: true });
     }
@@ -63,20 +48,26 @@ export default createClass({
 
     // load the necessary index information
     const index = await this.connector.loadIndex();
-    const categories = new Set();
-    Object.values(index).forEach((e) => categories.add(e.category));
+    const tags = new Set();
+    Object.values(index).forEach((e) =>
+      e.tags?.forEach((tag) => tags.add(tag))
+    );
     this.setState(
       {
         index,
-        categories: [...categories],
+        tags: [...tags],
         entryIds: Object.keys(index).sort().reverse(),
       },
       () => {
-        this.props.onCategories?.(this.state.categories);
+        this.props.onTags?.(this.state.tags);
         this.loadEntries(id);
         this.setIssueTracker();
       }
     );
+  },
+
+  onUpdate() {
+    this.props.onIndex(this.state.index);
   },
 
   render() {
@@ -115,11 +106,15 @@ export default createClass({
         return false;
       }
       var title = utils.titleReplace(entry.metaData.title);
-      var vanityURL = ["/", entry.metaData.created, "/", title].join("");
+      var vanityURL = ["/posts/", entry.metaData.created, "/", title].join("");
       history.replaceState({}, title, vanityURL);
     }
+
     return (
       <div ref="weblog" className="gh-weblog">
+        {this.state.pending ? <div className="pending">pending...</div> : null}
+        {this.generateToC()}
+        {this.generateTagList()}
         <Admin
           ref="admin"
           hidden="true"
@@ -130,6 +125,51 @@ export default createClass({
         {postButton}
         {this.generateEntries(entry ? [entry] : false)}
         {moreButton}
+      </div>
+    );
+  },
+
+  generateToC() {
+    const { singleton } = this.state;
+    return (
+      <nav className="toc">
+        <table>
+          {Object.values(this.state.index)
+            .reverse()
+            .map(({ title, published, tags }) => {
+              const date = new Date(published);
+              let when = date.toLocaleDateString("en-GB", {
+                month: "long",
+                day: "numeric",
+              });
+              when = when.split(` `)[1] + " " + when.split(` `)[0];
+              return (
+                <tr>
+                  <td className="year">{date.getFullYear()}</td>
+                  <td className="when">{when}</td>
+                  <td>
+                    <a
+                      href={`${singleton ? `../../` : ``}posts/${published}/${utils.titleReplace(title)}`}
+                    >
+                      {title}
+                    </a>
+                  </td>
+                </tr>
+              );
+            })}
+        </table>
+      </nav>
+    );
+  },
+
+  generateTagList() {
+    const { tags } = this.state;
+    if (!tags) return;
+    return (
+      <div className="taglist">
+        {tags.sort().map((tag) => (
+          <span>{tag.toLowerCase()}</span>
+        ))}
       </div>
     );
   },
@@ -145,24 +185,26 @@ export default createClass({
   generateEntries(entries) {
     entries = entries || this.getSlice();
     if (!entries.length) return;
-
     const { issues, singleton, authenticated } = this.state;
-
-    return entries.map((entry) => {
-      return entry.metaData.draft && !authenticated ? null : (
-        <Entry
-          key={entry.metaData.id}
-          id={entry.metaData.id}
-          ref={entry.metaData.id}
-          issues={issues}
-          metaData={entry.metaData}
-          postData={entry.postData}
-          editable={!singleton && authenticated}
-          onSave={this.saveEntry}
-          onDelete={this.deleteEntry}
-        />
-      );
-    });
+    return (
+      <main>
+        {entries.map((entry) => {
+          return entry.metaData.draft && !authenticated ? null : (
+            <Entry
+              key={entry.metaData.id}
+              id={entry.metaData.id}
+              ref={entry.metaData.id}
+              issues={issues}
+              metaData={entry.metaData}
+              postData={entry.postData}
+              editable={!singleton && authenticated}
+              onSave={this.saveEntry}
+              onDelete={this.deleteEntry}
+            />
+          );
+        })}
+      </main>
+    );
   },
 
   // ------------------------------------------------------------
@@ -193,27 +235,20 @@ export default createClass({
   },
 
   more() {
-    this.setState(
-      {
-        slice: {
-          start: this.state.slice.start,
-          end: this.state.slice.end + 10,
-        },
-      },
-      this.loadEntries
-    );
+    const { start, end } = this.state.slice;
+    const slice = { start, end: end + 10 };
+    this.setState({ slice }, () => this.loadEntries());
   },
 
   // ------------------------------------------------------------
 
   loadEntries(id) {
     const { updateEntry, connector, state } = this;
-    const { entryIds } = state;
 
     // find load slice
     const start = state.slice.start;
     const end = state.slice.end;
-    const slice = id ? [id] : entryIds.slice(start, end);
+    const slice = id ? [id] : state.entryIds.slice(start, end);
 
     // run through all
     (async function next(list) {
@@ -240,22 +275,22 @@ export default createClass({
     };
     const postData = "...click here to start editing your post...";
     const id = (metaData.id = timeToId(timestamp));
-    console.log(`created:`, { id, metaData, postData });
     this.updateEntry(id, metaData, postData);
   },
 
-  updateEntry(id, metaData, postData) {
+  /* async */ updateEntry(id, metaData, postData) {
     const { entries, index } = this.state;
     entries[id] = { metaData, postData };
-    const entryIds = Object.keys(entries).sort().reverse();
-    const { title, published, category, draft } = metaData;
-    index[id] = { title, published, category, draft };
+    const entryIds = Object.keys(index).sort().reverse();
+    const { title, published, tags, draft } = metaData;
+    index[id] = { title, published, tags, draft };
     return new Promise((resolve) =>
       this.setState({ entryIds, entries, index }, resolve)
     );
   },
 
   async saveEntry(entry) {
+    this.setState({ pending: true });
     const metaData = entry.getMetaData();
     const id = metaData.id;
     const postData = entry.getPostData();
@@ -263,28 +298,28 @@ export default createClass({
     this.connector.saveEntry(
       { id, metaData, postData },
       this.state.index,
-      () => {
+      async () => {
         console.log("save handled");
-        this.saveRSS();
+        await this.saveRSS();
+        this.setState({ pending: false });
       }
     );
   },
 
-  deleteEntry(entry) {
+  async deleteEntry(entry) {
     if (confirm("really delete post?")) {
+      this.setState({ pending: true });
       var id = entry.state.id;
-
-      // remove from entryIds, entries, and index
       const { entryIds, entries, index } = this.state;
       const pos = entryIds.indexOf(id);
       entryIds.splice(pos, 1);
       delete entries[id];
       delete index[id];
-
       this.setState({ entryIds, entries, index });
-      this.connector.deleteEntry(id, index, () => {
+      this.connector.deleteEntry(id, index, async () => {
         console.log("delete handled");
-        this.saveRSS();
+        await this.saveRSS();
+        this.setState({ pending: false });
       });
     }
   },
@@ -292,39 +327,26 @@ export default createClass({
   // ------------------------------------------------------------
 
   saveRSS() {
-    var connector = this.connector;
-    console.log(`Updating RSS...`);
-    connector.saveRSS(this.toRSS(), () => {
-      console.log(`updated.`);
-      if (this.props.rssfeeds) {
-        console.log(`Updating category-specific RSS...`);
-        const feeds = this.props.rssfeeds
-          .split(",")
-          .map((v) => v.trim())
-          .filter((v) => !!v);
-
-        (function nextCategory(self) {
-          if (feeds.length === 0) return console.log(`All RSS feeds updated`);
-          var category = feeds.splice(0, 1)[0];
-          console.log(`Updating category ${category}`);
-          connector.saveRSS(
-            self.toRSS(category),
-            category.toLowerCase(),
-            nextCategory
-          );
-        })(this);
-      }
+    return new Promise((resolve) => {
+      var connector = this.connector;
+      console.log(`Updating RSS...`);
+      connector.saveRSS(this.toRSS(), () => {
+        console.log(`updated.`);
+        resolve();
+      });
     });
   },
 
-  toRSS(category) {
+  toRSS() {
+    const { singleton, slice, entries, entryIds } = this.state;
+
     // Don't update RSS if we're looking at a single entry.
     // We shouldn't even get to this function, really.
-    if (this.state.singleton) return;
+    if (singleton) return;
 
     // Don't update if there was a change to out-of-RSS content,
     // because those changes won't make it into the RSS feed anyway.
-    if (this.state.slice.start >= 10) return;
+    if (slice.start >= 10) return;
 
     const { base } = this.props;
     const html = document.getElementById(`gh-weblog`);
@@ -332,39 +354,42 @@ export default createClass({
 
     // Boilerplate RSS 2.0 header
     var rssHeading = `<?xml version="1.0" encoding="UTF-8" ?>
-  <rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
-    <channel>
-      <atom:link href="${base}/${
-      this.props.path
-    }/rss.xml" rel="self" type="application/rss+xml" />
-      <title>${document.title}</title>
-      <description>${description}${
-      category ? ` [${category} posts only]` : ``
-    }</description>
-      <link>${location.toString()}</link>
-      <lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
-      <pubDate>${new Date().toUTCString()}</pubDate>
-      <ttl>1440</ttl>
-  `;
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+<channel>
+<atom:link href="${base}/${this.props.path}/rss.xml" rel="self" type="application/rss+xml" />
+<title>${document.title}</title>
+<description>${description}</description>
+<link>${location.toString()}</link>
+<lastBuildDate>${new Date().toUTCString()}</lastBuildDate>
+<pubDate>${new Date().toUTCString()}</pubDate>
+<ttl>1440</ttl>`;
 
     // generate the RSS for the latest 10 entries only.
-    var entryIds = Object.keys(this.list).sort().reverse().slice(0, 10);
     var entriesRSS = entryIds
-      .map((id) => this.refs[id].toRSS(base, category))
+      .slice(0, 10)
+      .map((id) => this.entryToRSS(entries[id]))
       .filter((v) => !!v)
       .join("\n");
 
     // Boilerplate tail bit for the RSS feed
-    var rssTail = `
-    </channel>
-  </rss>
-  `;
+    var rssTail = `</channel></rss>`;
 
     // concatenated
-    var rss = rssHeading + entriesRSS + rssTail;
-    console.log(rss);
+    return rssHeading + entriesRSS + rssTail;
+  },
 
-    // we're done here.
-    return rss;
+  entryToRSS(entry) {
+    const { metaData, postData } = entry;
+    const { published } = metaData;
+    const html = marked(postData);
+    const { base } = WebLogSettings.getSettings();
+    return `<item>
+<title>${metaData.title}</title>
+<description><![CDATA[${html}]]></description>
+${metaData.tags.map((tag) => `<category>${tag}</category>`).join(`\n`)}
+<link>${base}?postid=${published}</link>
+<guid>${base}?postid=${published}</guid>
+<pubDate>${new Date(published).toUTCString()}</pubDate>
+</item>`;
   },
 });

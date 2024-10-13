@@ -1,4 +1,8 @@
-import { Octokit } from "@octokit/rest";
+import { Octokit as OctokitCore } from "@octokit/core";
+import { createOrUpdateTextFile } from "@octokit/plugin-create-or-update-text-file";
+const Octokit = OctokitCore.plugin(createOrUpdateTextFile);
+
+import utils from "./utils.js";
 
 export default class Connector {
   constructor(options) {
@@ -61,137 +65,84 @@ export default class Connector {
   }
 
   async saveEntry({ id, metaData, postData }, index, saved) {
+    const { title, published } = metaData;
+    const path = `${this.path}/content/posts/`;
+    const files = [
+      {
+        message: `Saving post data`,
+        path: `${path}markdown/${id}.md`,
+        content: postData,
+      },
+      {
+        message: `Saving metadata`,
+        path: `${path}metadata/${id}.json`,
+        content: JSON.stringify(metaData, false, 2),
+      },
+      {
+        message: `Saving updated index`,
+        path: `${path}index.json`,
+        content: JSON.stringify(index, false, 2),
+      },
+      {
+        message: `Saving static redirect page`,
+        path: `posts/${published}/${utils.titleReplace(title)}/index.html`,
+        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${published}">`,
+      },
+    ];
+    await this.processCommit(files);
+    saved?.();
+  }
+
+  async deleteEntry(id, index, deleted) {
+    const { title, published } = index[id];
+    const path = `${this.path}/content/posts/`;
+    const files = [
+      {
+        message: `Deleting post data`,
+        path: `${path}markdown/${id}.md`,
+      },
+      {
+        message: `Deleting metadata`,
+        path: `${path}metadata/${id}.json`,
+      },
+      {
+        message: `Saving updated index`,
+        path: `${path}index.json`,
+        content: JSON.stringify(index, false, 2),
+      },
+      {
+        message: `Deleting static redirect page`,
+        path: `posts/${published}/${utils.titleReplace(title)}/index.html`,
+      },
+    ];
+    await this.processCommit(files);
+    deleted?.();
+  }
+
+  async processCommit(files) {
     const { options, octokit } = this;
     const { user: owner, repo, branch } = options;
-    const path = `${this.path}/content/posts/`;
-    const message = `Saving new entry ${id}`;
-    const content = {};
+    for (const { message, path, content = null } of files) {
+      const params = { owner, repo, branch, path, content, message };
+      await octokit.createOrUpdateTextFile(params);
+    }
+  }
 
-    // Prepare our "files"
+  async saveRSS(rss, updated) {
+    const { options, octokit } = this;
+    const { user: owner, repo, branch } = options;
 
-    console.log(`index`, index);
-    const indexData = JSON.stringify(index, false, 2);
-    const indexFilename = `${path}index.json`;
-    content[indexFilename] = (
-      await this.octokit.git.createBlob({
-        owner,
-        repo,
-        content: indexData,
-        encoding: "utf-8",
-      })
-    ).data;
+    // TODO: add dedicated category RSS files?
 
-    console.log(`metadata`, metaData);
-    metaData = JSON.stringify(metaData, false, 2);
-    const metaDataFilename = `${path}metadata/${id}.json`;
-    content[metaDataFilename] = (
-      await this.octokit.git.createBlob({
-        owner,
-        repo,
-        content: metaData,
-        encoding: "utf-8",
-      })
-    ).data;
-
-    console.log(`postdata`, postData);
-    const postDataFilename = `${path}markdown/${id}.md`;
-    content[postDataFilename] = (
-      await this.octokit.git.createBlob({
-        owner,
-        repo,
-        content: postData,
-        encoding: "utf-8",
-      })
-    ).data;
-
-    // Then prepare a tree that we'll push up
-    console.log(`forming path/blob tree association`);
-    const paths = Object.keys(content);
-    const blobs = Object.values(content);
-    const tree = blobs.map(({ sha }, index) => ({
-      path: paths[index],
-      mode: `100644`,
-      type: `blob`,
-      sha,
-    }));
-
-    // Create the tree and get its sha
-    const currentSha = await this.getCurrentSha();
-    console.log(`create tree, currentSha is ${currentSha}`);
-    const treeSha = (
-      await octokit.git.createTree({
-        owner,
-        repo,
-        tree,
-        base_tree: currentSha,
-      })
-    ).data.sha;
-
-    // Create a commit and get its sha
-    const newCommit = (
-      await octokit.git.createCommit({
-        owner,
-        repo,
-        message,
-        tree: treeSha,
-        parents: [currentSha],
-      })
-    ).data;
-
-    // Update the branch ref
-    octokit.git.updateRef({
+    await octokit.createOrUpdateTextFile({
       owner,
       repo,
-      ref: `heads/${branch}`,
-      sha: newCommit.sha,
+      branch,
+      path: `${this.path}/rss.xml`,
+      content: rss,
+      message: `Update to RSS`,
     });
-  }
 
-  deleteEntry(entry, index, deleted) {
-    const id = entry.state.id;
-    const path = `${this.path}/content/posts/`;
-    const commitMessage = `Removing entry ${id}`;
-
-    const indexData = JSON.stringify({ index: index.sort() }, false, 2);
-    const indexFilename = `${path}index.json`;
-    const metaDataFilename = `${path}metaData/${id}.json`;
-    const postDataFilename = `${path}markdown/${id}.md`;
-    const branch = this.branch;
-
-    try {
-      // update index
-      branch
-        .write(indexFilename, indexData, commitMessage)
-        // then remove posts
-        .then(() => branch.remove(metaDataFilename, commitMessage))
-        .then(() => branch.remove(postDataFilename, commitMessage))
-        .then(() => {
-          console.log(`Removed entry ${id} from github.`);
-          if (deleted) deleted(entry);
-        });
-    } catch (e) {
-      console.error(`deleting went horribly wrong`);
-      throw e;
-    }
-  }
-
-  saveRSS(rss, category, updated) {
-    if (typeof category === "function") {
-      updated = category;
-      category = false;
-    }
-    category = category ? `${category}-` : ``;
-    const rssFilename = `${this.path}/${category}rss.xml`;
-    const commitMessage = `Update to RSS XML`;
-
-    try {
-      this.branch.write(rssFilename, rss, commitMessage).then(() => {
-        console.log(`Updated RSS on github.`);
-        if (updated) updated();
-      });
-    } catch (e) {
-      console.error(`updating RSS went horribly wrong`);
-      throw e;
-    }
+    updated?.();
   }
 }

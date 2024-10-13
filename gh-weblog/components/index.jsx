@@ -6,8 +6,12 @@ const settings = WebLogSettings.getSettings();
 const id = settings.target || "gh-weblog";
 const target = document.getElementById(id);
 
-async function handleCategories(categories) {
-  console.log(categories);
+async function handleTags(tags) {
+  // console.log(tags);
+}
+
+async function handleIndex(index) {
+  // console.log(index);
 }
 
 if (!target) {
@@ -17,7 +21,8 @@ if (!target) {
   React.render(
     React.createElement(WebLog, {
       ...settings,
-      onCategories: handleCategories,
+      onTags: handleTags,
+      onIndex: handleIndex,
     }),
     target
   );

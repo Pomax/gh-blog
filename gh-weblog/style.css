@@ -1,4 +1,70 @@
-.gh-weblog {
+:root {
+  --link-color: blue;
+}
+
+@keyframes gh-weblog-pulse {
+  from {
+    background-color: var(--bg1);
+  }
+  to {
+    background-color: var(--bg2);
+  }
+}
+
+#gh-weblog {
+  position: relative;
+
+  main {
+    margin: 1em 0;
+  }
+
+  .pending {
+    --bg1: #0005;
+    --bg2: #3597;
+    position: fixed;
+    top: 0;
+    right: 0;
+    bottom: 0;
+    left: 0;
+    z-index: 2;
+    animation: gh-weblog-pulse 2s ease-in-out infinite alternate;
+    color: transparent;
+  }
+
+  nav {
+    background: white;
+    table {
+      display: block;
+      width: 100%;
+      max-height: 10em;
+      overflow: auto;
+      td {
+        &:nth-child(2) {
+          text-align: center;
+          white-space: nowrap;
+        }
+        &:nth-child(3) {
+          width: 100%;
+        }
+      }
+      tr td a {
+        color: var(--link-color);
+      }
+    }
+  }
+
+  .taglist {
+    margin: 1em 0 1em;
+    width: 100%;
+    max-width: 100%;
+    background: white;
+    color: var(--link-color);
+    span {
+      display: inline-block;
+      margin: 0 0.25em;
+    }
+  }
+
   a {
     &.comments {
       position: relative;
@@ -16,13 +82,10 @@
     }
 
     &.authenticate {
-      border: none;
-      background: inherit;
-      color: white;
-      font-size: 50;
-      float: right;
+      position: absolute;
+      top: -2em;
+      right: 0em;
       cursor: pointer;
-      margin-top: -1em;
     }
 
     &.authenticate:hover {
@@ -58,7 +121,7 @@
       background: #efedd8;
     }
 
-    tbody tr:nth-child(2n) {
+    tr:nth-child(2n) {
       background: #e5e5e5;
     }
   }
