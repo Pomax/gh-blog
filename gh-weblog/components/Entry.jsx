@@ -40,12 +40,13 @@ export default createClass({
     }
     const posted = new Date(state.published).toLocaleString();
     const updated = new Date(state.updated).toLocaleString();
+
     return (
-      <div className="entry" id={`gh-weblog-${state.published}`}>
+      <div className="entry" id={`gh-weblog-${state.created}`}>
         {deleteButton}
         <header>
           <h1>
-            <a href={`pages/${state.published}/${title}`}>{state.title}</a>
+            <a href={`pages/${state.created}/${title}`}>{state.title}</a>
           </h1>
           <h2>
             Originally posted on {posted}, last updated on {updated}
@@ -56,6 +57,8 @@ export default createClass({
           hidden={state.editing}
           text={state.postData}
           onClick={this.edit}
+          singleton={this.props.singleton}
+          editable={this.props.editable}
         />
         <Editor
           ref="editor"
@@ -96,7 +99,9 @@ export default createClass({
     return this.refs.markdown.getHTML();
   },
 
-  edit() {
+  edit(evt) {
+    console.log(evt.target);
+    return;
     if (this.props.editable) {
       this.refs.editor.setText(this.getPostData());
       this.setState({ editing: true });
@@ -119,5 +124,5 @@ export default createClass({
 
   delete() {
     this.props.onDelete(this);
-  }
+  },
 });

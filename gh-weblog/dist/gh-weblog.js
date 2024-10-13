@@ -6417,7 +6417,7 @@ var utils_default = {
    * Clean up a title so that it'll look good as a vanity URL.
    */
   titleReplace(title2) {
-    return title2.replace(/[\s\:;,_.'"#!?\u2010-\u2015]+/g, "-").replace(/-+/g, "-").replace(/^-/, "").replace(/-$/, "").toLowerCase();
+    return title2.replace(/[\s\:;,_.'"#!?\u2010-\u2015]+/g, "-").replace(/-+/g, "-").replace(/^-/, "").replace(/-$/, "").replaceAll(`<`, "").replaceAll(`>`, "").toLowerCase();
   }
 };
 
@@ -7347,7 +7347,25 @@ var marked_default = marked;
 // components/MarkDown.jsx
 var MarkDown_default = react_0_12_min_default.createClass({
   render() {
-    const html = { __html: marked_default(this.props.text) };
+    const { text } = this.props;
+    let html = marked_default(text);
+    if (!this.props.editable && !this.props.singleton) {
+      if (text.length > 1500) {
+        let cut = html.indexOf(`<p>`);
+        for (let i = 0; i < 5; i++) {
+          cut = html.indexOf(`<p>`, cut + 4);
+        }
+        if (text.length - cut > 500) {
+          html = `<details>
+  <summary>
+${html.substring(0, cut)}
+  <div class="shade">&nbsp;</div>
+  </summary>
+${html.substring(cut)}
+</details>`;
+        }
+      }
+    }
     return /* @__PURE__ */ react_0_12_min_default.createElement(
       "div",
       {
@@ -7355,7 +7373,7 @@ var MarkDown_default = react_0_12_min_default.createClass({
         className: "post",
         hidden: this.props.hidden,
         onClick: this.props.onClick,
-        dangerouslySetInnerHTML: html
+        dangerouslySetInnerHTML: { __html: html }
       }
     );
   },
@@ -7444,13 +7462,15 @@ var Entry_default = createClass({
     }
     const posted = new Date(state.published).toLocaleString();
     const updated = new Date(state.updated).toLocaleString();
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.published}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `pages/${state.published}/${title2}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `pages/${state.created}/${title2}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
       MarkDown_default,
       {
         ref: "markdown",
         hidden: state.editing,
         text: state.postData,
-        onClick: this.edit
+        onClick: this.edit,
+        singleton: this.props.singleton,
+        editable: this.props.editable
       }
     ), /* @__PURE__ */ react_0_12_min_default.createElement(
       Editor_default,
@@ -7488,7 +7508,9 @@ ${this.state.postData}`;
   getHTMLData() {
     return this.refs.markdown.getHTML();
   },
-  edit() {
+  edit(evt) {
+    console.log(evt.target);
+    return;
     if (this.props.editable) {
       this.refs.editor.setText(this.getPostData());
       this.setState({ editing: true });
@@ -8691,7 +8713,7 @@ var Connector = class {
     return blobData.data;
   }
   async saveEntry({ id: id2, metaData, postData }, index, saved) {
-    const { title: title2, published } = metaData;
+    const { title: title2, created } = metaData;
     const path2 = `${this.path}/content/posts/`;
     const files = [
       {
@@ -8711,15 +8733,15 @@ var Connector = class {
       },
       {
         message: `Saving static redirect page`,
-        path: `pages/${published}/${utils_default.titleReplace(title2)}/index.html`,
-        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${published}">`
+        path: `pages/${created}/${utils_default.titleReplace(title2)}/index.html`,
+        content: `<title>${title2}</title><meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${created}">`
       }
     ];
     await this.processCommit(files);
     saved?.();
   }
   async deleteEntry(id2, index, deleted) {
-    const { title: title2, published } = index[id2];
+    const { title: title2, created } = index[id2];
     const path2 = `${this.path}/content/posts/`;
     const files = [
       {
@@ -8737,7 +8759,7 @@ var Connector = class {
       },
       {
         message: `Deleting static redirect page`,
-        path: `pages/${published}/${utils_default.titleReplace(title2)}/index.html`
+        path: `pages/${created}/${utils_default.titleReplace(title2)}/index.html`
       }
     ];
     await this.processCommit(files);
@@ -8864,8 +8886,8 @@ var WebLog_default = createClass({
   },
   generateToC() {
     const { singleton } = this.state;
-    return /* @__PURE__ */ react_0_12_min_default.createElement("nav", { className: "toc" }, /* @__PURE__ */ react_0_12_min_default.createElement("table", null, Object.values(this.state.index).reverse().map(({ title: title2, published, tags }) => {
-      const date = new Date(published);
+    return /* @__PURE__ */ react_0_12_min_default.createElement("nav", { className: "toc" }, /* @__PURE__ */ react_0_12_min_default.createElement("table", null, Object.values(this.state.index).reverse().map(({ title: title2, created, tags }) => {
+      const date = new Date(created);
       let when = date.toLocaleDateString("en-GB", {
         month: "long",
         day: "numeric"
@@ -8874,13 +8896,14 @@ var WebLog_default = createClass({
       return /* @__PURE__ */ react_0_12_min_default.createElement("tr", null, /* @__PURE__ */ react_0_12_min_default.createElement("td", { className: "year" }, date.getFullYear()), /* @__PURE__ */ react_0_12_min_default.createElement("td", { className: "when" }, when), /* @__PURE__ */ react_0_12_min_default.createElement("td", null, /* @__PURE__ */ react_0_12_min_default.createElement(
         "a",
         {
-          href: `${singleton ? `../../` : ``}pages/${published}/${utils_default.titleReplace(title2)}`
+          href: `${singleton ? `../../` : ``}pages/${created}/${utils_default.titleReplace(title2)}`
         },
         title2
       )));
     })));
   },
   generateTagList() {
+    return null;
     const { tags } = this.state;
     if (!tags) return;
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "taglist" }, tags.sort().map((tag) => /* @__PURE__ */ react_0_12_min_default.createElement("span", null, tag.toLowerCase())));
@@ -8906,6 +8929,7 @@ var WebLog_default = createClass({
           issues,
           metaData: entry.metaData,
           postData: entry.postData,
+          singleton,
           editable: !singleton && authenticated,
           onSave: this.saveEntry,
           onDelete: this.deleteEntry
@@ -8942,6 +8966,7 @@ var WebLog_default = createClass({
   // ------------------------------------------------------------
   loadEntries(id2) {
     const { updateEntry, connector, state } = this;
+    console.log(`loadEntries(${id2})`, state.index[id2]);
     const start = state.slice.start;
     const end = state.slice.end;
     const slice = id2 ? [id2] : state.entryIds.slice(start, end);
@@ -8975,8 +9000,8 @@ var WebLog_default = createClass({
     const { entries, index } = this.state;
     entries[id2] = { metaData, postData };
     const entryIds = Object.keys(index).sort().reverse();
-    const { title: title2, published, tags, draft } = metaData;
-    index[id2] = { title: title2, published, tags, draft };
+    const { title: title2, created, tags, draft } = metaData;
+    index[id2] = { title: title2, created, tags, draft };
     return new Promise(
       (resolve) => this.setState({ entryIds, entries, index }, resolve)
     );
@@ -9048,7 +9073,7 @@ var WebLog_default = createClass({
   },
   entryToRSS(entry) {
     const { metaData, postData } = entry;
-    const { published } = metaData;
+    const { created, published } = metaData;
     const html = marked_default(postData);
     const { base: base2 } = weblogsettings_default.getSettings();
     return `<item>
@@ -9056,8 +9081,8 @@ var WebLog_default = createClass({
 <description><![CDATA[${html}]]></description>
 ${metaData.tags.map((tag) => `<category>${tag}</category>`).join(`
 `)}
-<link>${base2}?postid=${published}</link>
-<guid>${base2}?postid=${published}</guid>
+<link>${base2}?postid=${created}</link>
+<guid>${base2}?postid=${created}</guid>
 <pubDate>${new Date(published).toUTCString()}</pubDate>
 </item>`;
   }

@@ -136,8 +136,8 @@ export default createClass({
         <table>
           {Object.values(this.state.index)
             .reverse()
-            .map(({ title, published, tags }) => {
-              const date = new Date(published);
+            .map(({ title, created, tags }) => {
+              const date = new Date(created);
               let when = date.toLocaleDateString("en-GB", {
                 month: "long",
                 day: "numeric",
@@ -149,7 +149,7 @@ export default createClass({
                   <td className="when">{when}</td>
                   <td>
                     <a
-                      href={`${singleton ? `../../` : ``}pages/${published}/${utils.titleReplace(title)}`}
+                      href={`${singleton ? `../../` : ``}pages/${created}/${utils.titleReplace(title)}`}
                     >
                       {title}
                     </a>
@@ -163,6 +163,8 @@ export default createClass({
   },
 
   generateTagList() {
+    return null;
+    // We'll deal with this in follow-up
     const { tags } = this.state;
     if (!tags) return;
     return (
@@ -197,6 +199,7 @@ export default createClass({
               issues={issues}
               metaData={entry.metaData}
               postData={entry.postData}
+              singleton={singleton}
               editable={!singleton && authenticated}
               onSave={this.saveEntry}
               onDelete={this.deleteEntry}
@@ -245,6 +248,8 @@ export default createClass({
   loadEntries(id) {
     const { updateEntry, connector, state } = this;
 
+    console.log(`loadEntries(${id})`, state.index[id]);
+
     // find load slice
     const start = state.slice.start;
     const end = state.slice.end;
@@ -282,8 +287,8 @@ export default createClass({
     const { entries, index } = this.state;
     entries[id] = { metaData, postData };
     const entryIds = Object.keys(index).sort().reverse();
-    const { title, published, tags, draft } = metaData;
-    index[id] = { title, published, tags, draft };
+    const { title, created, tags, draft } = metaData;
+    index[id] = { title, created, tags, draft };
     return new Promise((resolve) =>
       this.setState({ entryIds, entries, index }, resolve)
     );
@@ -380,15 +385,15 @@ export default createClass({
 
   entryToRSS(entry) {
     const { metaData, postData } = entry;
-    const { published } = metaData;
+    const { created, published } = metaData;
     const html = marked(postData);
     const { base } = WebLogSettings.getSettings();
     return `<item>
 <title>${metaData.title}</title>
 <description><![CDATA[${html}]]></description>
 ${metaData.tags.map((tag) => `<category>${tag}</category>`).join(`\n`)}
-<link>${base}?postid=${published}</link>
-<guid>${base}?postid=${published}</guid>
+<link>${base}?postid=${created}</link>
+<guid>${base}?postid=${created}</guid>
 <pubDate>${new Date(published).toUTCString()}</pubDate>
 </item>`;
   },

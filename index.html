@@ -1,26 +1,78 @@
-<!DOCTYPE html>
+<!doctype html>
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>Github weblogging</title>
+    <title>Pomax.github.io</title>
+
+    <link rel="preconnect" href="https://fonts.googleapis.com" />
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+    <link
+      href="https://fonts.googleapis.com/css2?family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap"
+      rel="stylesheet"
+      async
+    />
+
     <link rel="stylesheet" href="style.css" />
     <link rel="stylesheet" href="gh-weblog/style.css" />
-    <script src="gh-weblog/dist/gh-weblog.js" async defer></script>
+
+    <!-- my personal blog uses MathJax for maths typesetting. Add that in: -->
+    <script type="text/x-mathjax-config">
+      MathJax.Hub.Config({
+        displayAlign: "left",
+        displayIndent: "2em",
+        TeX: {
+          extensions: ["color.js"]
+        }
+      });
+    </script>
+    <script src="//cdnjs.cloudflare.com/ajax/libs/mathjax/2.3/MathJax.js?config=TeX-AMS_HTML"></script>
+    <script src="mj.js"></script>
   </head>
   <body>
     <header>
-      <h1><a href=".">Github weblogging</a></h1>
-      <h2>
-        With perhaps a subtitle (Also available in
-        <a href="gh-weblog/rss.xml">RSS</a> form)
-      </h2>
+      <h1><a href=".">Pomax.github.io</a></h1>
+      <h2>Because chronicling the past using technology is kind of cool.</h2>
+      <h3>
+        <a href="http://mastodon.social/@TheRealPomax">
+          <img src="images/logo-purple.svg" />
+        </a>
+        <a href="./gh-weblog/rss.xml">
+          <img src="//upload.wikimedia.org/wikipedia/en/4/43/Feed-icon.svg" />
+        </a>
+      </h3>
     </header>
+
+    <section id="projects">
+      <span>
+        <a href="https://pomax.github.io/bezierinfo"
+          >A Primer on Bézier Curves</a
+        >
+      </span>
+      <span>
+        <a href="https://pomax.github.io/bezierjs/">A Bezier.js library</a>
+      </span>
+      <span
+        ><a href="http://www.nihongoresources.com">Nihongo Resources</a></span
+      >
+      <span>
+        <a href="https://github.com/Pomax?tab=repositories"
+          >Github Repositories</a
+        >
+      </span>
+      <span><a href="https://www.npmjs.com/~pomax">My npmjs profile</a></span>
+      <span>
+        <a href="https://mastodon.social/@TheRealPomax">My twitter stream</a>
+      </span>
+    </section>
 
     <section
       id="gh-weblog"
       data-base="https://pomax.github.io/blog-test-repo"
       data-site="https://github.com/Pomax/gh-weblog"
-      data-description="A free, simple github-based blogging platform"
+      data-description="Because chronicling the past using technology is kind of cool."
     ></section>
+
+    <!-- wtf, chrome? Why do you not honour the "defer" attribute? -->
+    <script src="gh-weblog/dist/gh-weblog.js" async defer></script>
   </body>
 </html>

@@ -8,6 +8,8 @@ export default {
       .replace(/-+/g, "-")
       .replace(/^-/, "")
       .replace(/-$/, "")
+      .replaceAll(`<`, "")
+      .replaceAll(`>`, "")
       .toLowerCase();
   },
 };
