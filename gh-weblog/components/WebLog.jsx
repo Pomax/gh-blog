@@ -96,7 +96,11 @@ export default createClass({
         admin
       </button>
     );
-    var moreButton = <button onClick={this.more}>Load more posts</button>;
+    var moreButton = (
+      <button className="more-posts" onClick={this.more}>
+        Load more posts
+      </button>
+    );
     return this.renderContent(adminButton, postButton, moreButton);
   },
 
@@ -242,9 +246,15 @@ export default createClass({
   },
 
   more() {
+    document.querySelector(`.more-posts`).disabled = true;
+    document.querySelector(`.more-posts`).style.opacity = 0.1;
     const { start, end } = this.state.slice;
     const slice = { start, end: end + 10 };
-    this.setState({ slice }, () => this.loadEntries());
+    this.setState({ slice }, async () => {
+      await this.loadEntries();
+      document.querySelector(`.more-posts`).disabled = false;
+      document.querySelector(`.more-posts`).style.opacity = 1;
+    });
   },
 
   // ------------------------------------------------------------
@@ -257,15 +267,17 @@ export default createClass({
     const end = state.slice.end;
     const slice = id ? [id] : state.entryIds.slice(start, end);
 
-    // run through all
-    (async function next(list) {
-      if (!list.length) return;
-      const id = list.shift();
-      const metaData = await connector.loadMetaData(id);
-      const postData = await connector.loadPostData(id);
-      updateEntry(id, metaData, postData);
-      next(list);
-    })(slice);
+    return new Promise((resolve) => {
+      // run through all
+      (async function next(list) {
+        if (!list.length) return resolve();
+        const id = list.shift();
+        const metaData = await connector.loadMetaData(id);
+        const postData = await connector.loadPostData(id);
+        updateEntry(id, metaData, postData);
+        next(list);
+      })(slice);
+    });
   },
 
   createEntry() {

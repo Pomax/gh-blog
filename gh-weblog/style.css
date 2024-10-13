@@ -91,6 +91,12 @@
     &.authenticate:hover {
       box-shadow: none;
     }
+
+    &.more-posts {
+      width: 8rem;
+      margin: 0 auto 1rem;
+      display: block;
+    }
   }
 
   code {
