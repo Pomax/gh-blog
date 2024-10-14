@@ -9031,24 +9031,26 @@ var WebLog_default = createClass({
     );
   },
   async saveEntry(entry) {
+    const { connector } = this;
     this.setState({ pending: true });
     const metaData = entry.getMetaData();
     const id2 = metaData.id;
     const postData = entry.getPostData();
     await this.updateEntry(id2, metaData, postData);
-    this.connector.saveEntry(
+    connector.saveEntry(
       { id: id2, metaData, postData },
       this.state.index,
       async () => {
         console.log("save handled");
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
-          await waitForDeploy();
+          await connector.waitForDeploy();
         });
       }
     );
   },
   async deleteEntry(entry) {
+    const { connector } = this;
     if (confirm("really delete post?")) {
       this.setState({ pending: true }, () => {
         const { entryIds, entries, index } = this.state;
@@ -9059,12 +9061,12 @@ var WebLog_default = createClass({
         delete index[id2];
         this.setState({ entryIds, entries, index }, () => {
           const { index: index2 } = this.state;
-          this.connector.deleteEntry(id2, title2, created, index2, async () => {
+          connector.deleteEntry(id2, title2, created, index2, async () => {
             console.log("delete handled");
             await this.loadEntries();
             this.saveRSS();
             this.setState({ pending: false }, async () => {
-              await waitForDeploy();
+              await connector.waitForDeploy();
             });
           });
         });

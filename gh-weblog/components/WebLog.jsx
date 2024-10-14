@@ -311,25 +311,27 @@ export default createClass({
   },
 
   async saveEntry(entry) {
+    const { connector } = this;
     this.setState({ pending: true });
     const metaData = entry.getMetaData();
     const id = metaData.id;
     const postData = entry.getPostData();
     await this.updateEntry(id, metaData, postData);
-    this.connector.saveEntry(
+    connector.saveEntry(
       { id, metaData, postData },
       this.state.index,
       async () => {
         console.log("save handled");
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
-          await waitForDeploy();
+          await connector.waitForDeploy();
         });
       }
     );
   },
 
   async deleteEntry(entry) {
+    const { connector } = this;
     if (confirm("really delete post?")) {
       this.setState({ pending: true }, () => {
         const { entryIds, entries, index } = this.state;
@@ -340,7 +342,7 @@ export default createClass({
         delete index[id];
         this.setState({ entryIds, entries, index }, () => {
           const { index } = this.state;
-          this.connector.deleteEntry(id, title, created, index, async () => {
+          connector.deleteEntry(id, title, created, index, async () => {
             console.log("delete handled");
             // We need to run loadEntries to make sure we actually have
             // all the data available to regenerate the RSS. If we don't,
@@ -349,7 +351,7 @@ export default createClass({
             await this.loadEntries();
             this.saveRSS();
             this.setState({ pending: false }, async () => {
-              await waitForDeploy();
+              await connector.waitForDeploy();
             });
           });
         });
