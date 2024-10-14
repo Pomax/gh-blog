@@ -272,9 +272,11 @@ export default createClass({
       (async function next(list) {
         if (!list.length) return resolve();
         const id = list.shift();
-        const metaData = await connector.loadMetaData(id);
-        const postData = await connector.loadPostData(id);
-        updateEntry(id, metaData, postData);
+        if (!entries[id]) {
+          const metaData = await connector.loadMetaData(id);
+          const postData = await connector.loadPostData(id);
+          await updateEntry(id, metaData, postData);
+        }
         next(list);
       })(slice);
     });
@@ -295,7 +297,8 @@ export default createClass({
     this.updateEntry(id, metaData, postData);
   },
 
-  /* async */ updateEntry(id, metaData, postData) {
+  updateEntry(id, metaData, postData) {
+    // async, explicitly returns promise
     const { entries, index } = this.state;
     entries[id] = { metaData, postData };
     const { title, created, tags, draft } = metaData;
@@ -334,8 +337,9 @@ export default createClass({
       delete index[id];
       this.setState({ pending: false, entryIds, entries, index }, () => {
         const { index } = this.state;
-        this.connector.deleteEntry(id, title, created, index, () => {
+        this.connector.deleteEntry(id, title, created, index, async () => {
           console.log("delete handled");
+          await this.loadEntries();
           this.saveRSS();
           this.setState({ pending: false });
         });

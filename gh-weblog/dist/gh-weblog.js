@@ -8920,10 +8920,10 @@ var WebLog_default = createClass({
     return ids.map((id2) => state.entries[id2]).filter(Boolean);
   },
   generateEntries(entry) {
-    const entries = entry ? [entry] : this.getSlice();
-    if (!entries.length) return;
+    const entries2 = entry ? [entry] : this.getSlice();
+    if (!entries2.length) return;
     const { issues, singleton, authenticated } = this.state;
-    return /* @__PURE__ */ react_0_12_min_default.createElement("main", null, entries.map((entry2) => {
+    return /* @__PURE__ */ react_0_12_min_default.createElement("main", null, entries2.map((entry2) => {
       return entry2.metaData.draft && !authenticated ? null : /* @__PURE__ */ react_0_12_min_default.createElement(
         Entry_default,
         {
@@ -8983,9 +8983,11 @@ var WebLog_default = createClass({
       (/* @__PURE__ */ __name(async function next(list) {
         if (!list.length) return resolve();
         const id3 = list.shift();
-        const metaData = await connector.loadMetaData(id3);
-        const postData = await connector.loadPostData(id3);
-        updateEntry(id3, metaData, postData);
+        if (!entries[id3]) {
+          const metaData = await connector.loadMetaData(id3);
+          const postData = await connector.loadPostData(id3);
+          await updateEntry(id3, metaData, postData);
+        }
         next(list);
       }, "next"))(slice);
     });
@@ -9004,15 +9006,14 @@ var WebLog_default = createClass({
     const id2 = metaData.id = timeToId(timestamp);
     this.updateEntry(id2, metaData, postData);
   },
-  /* async */
   updateEntry(id2, metaData, postData) {
-    const { entries, index } = this.state;
-    entries[id2] = { metaData, postData };
+    const { entries: entries2, index } = this.state;
+    entries2[id2] = { metaData, postData };
     const { title: title2, created, tags, draft } = metaData;
     index[id2] = { title: title2, created, tags, draft };
     const entryIds = Object.keys(index).sort().reverse();
     return new Promise(
-      (resolve) => this.setState({ entryIds, entries, index }, resolve)
+      (resolve) => this.setState({ entryIds, entries: entries2, index }, resolve)
     );
   },
   async saveEntry(entry) {
@@ -9034,16 +9035,17 @@ var WebLog_default = createClass({
   async deleteEntry(entry) {
     if (confirm("really delete post?")) {
       this.setState({ pending: true });
-      const { entryIds, entries, index } = this.state;
+      const { entryIds, entries: entries2, index } = this.state;
       const { id: id2, created, title: title2 } = entry.state;
       const pos = entryIds.indexOf(id2);
       entryIds.splice(pos, 1);
-      delete entries[id2];
+      delete entries2[id2];
       delete index[id2];
-      this.setState({ pending: false, entryIds, entries, index }, () => {
+      this.setState({ pending: false, entryIds, entries: entries2, index }, () => {
         const { index: index2 } = this.state;
-        this.connector.deleteEntry(id2, title2, created, index2, () => {
+        this.connector.deleteEntry(id2, title2, created, index2, async () => {
           console.log("delete handled");
+          await this.loadEntries();
           this.saveRSS();
           this.setState({ pending: false });
         });
@@ -9059,7 +9061,7 @@ var WebLog_default = createClass({
     });
   },
   toRSS() {
-    const { singleton, slice, entries, entryIds, index } = this.state;
+    const { singleton, slice, entries: entries2, entryIds, index } = this.state;
     if (singleton) return;
     if (slice.start >= 10) return;
     const { base: base2 } = this.props;
@@ -9075,10 +9077,10 @@ var WebLog_default = createClass({
 <lastBuildDate>${(/* @__PURE__ */ new Date()).toUTCString()}</lastBuildDate>
 <pubDate>${(/* @__PURE__ */ new Date()).toUTCString()}</pubDate>
 <ttl>1440</ttl>`;
-    console.log(`toRSS`, { entryIds, entries, index });
+    console.log(`toRSS`, { entryIds, entries: entries2, index });
     var entriesRSS = entryIds.slice(0, 10).map((id2) => {
       console.log(`toRSS: processing ${id2}`);
-      return this.entryToRSS(entries[id2]);
+      return this.entryToRSS(entries2[id2]);
     }).filter((v) => !!v).join("\n");
     var rssTail = `</channel></rss>`;
     return rssHeading + entriesRSS + rssTail;
