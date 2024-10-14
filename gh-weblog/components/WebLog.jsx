@@ -333,9 +333,11 @@ export default createClass({
       delete entries[id];
       delete index[id];
       this.setState({ pending: false, entryIds, entries, index }, () => {
-        this.connector.deleteEntry(id, title, created, index, async () => {
+        const { index } = this.state;
+        this.connector.deleteEntry(id, title, created, index, () => {
           console.log("delete handled");
-          await this.saveRSS();
+          this.saveRSS();
+          this.setState({ pending: false });
         });
       });
     }
@@ -344,18 +346,15 @@ export default createClass({
   // ------------------------------------------------------------
 
   saveRSS() {
-    return new Promise((resolve) => {
-      var connector = this.connector;
-      console.log(`Updating RSS...`);
-      connector.saveRSS(this.toRSS(), () => {
-        console.log(`updated.`);
-        resolve();
-      });
+    var connector = this.connector;
+    console.log(`Updating RSS...`);
+    connector.saveRSS(this.toRSS(), () => {
+      console.log(`updated.`);
     });
   },
 
   toRSS() {
-    const { singleton, slice, entries, entryIds } = this.state;
+    const { singleton, slice, entries, entryIds, index } = this.state;
 
     // Don't update RSS if we're looking at a single entry.
     // We shouldn't even get to this function, really.
@@ -382,9 +381,14 @@ export default createClass({
 <ttl>1440</ttl>`;
 
     // generate the RSS for the latest 10 entries only.
+    console.log(`toRSS`, { entryIds, entries, index });
+
     var entriesRSS = entryIds
       .slice(0, 10)
-      .map((id) => this.entryToRSS(entries[id]))
+      .map((id) => {
+        console.log(`toRSS: processing ${id}`);
+        return this.entryToRSS(entries[id]);
+      })
       .filter((v) => !!v)
       .join("\n");
 

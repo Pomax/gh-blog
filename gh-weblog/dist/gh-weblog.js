@@ -9041,26 +9041,25 @@ var WebLog_default = createClass({
       delete entries[id2];
       delete index[id2];
       this.setState({ pending: false, entryIds, entries, index }, () => {
-        this.connector.deleteEntry(id2, title2, created, index, async () => {
+        const { index: index2 } = this.state;
+        this.connector.deleteEntry(id2, title2, created, index2, () => {
           console.log("delete handled");
-          await this.saveRSS();
+          this.saveRSS();
+          this.setState({ pending: false });
         });
       });
     }
   },
   // ------------------------------------------------------------
   saveRSS() {
-    return new Promise((resolve) => {
-      var connector = this.connector;
-      console.log(`Updating RSS...`);
-      connector.saveRSS(this.toRSS(), () => {
-        console.log(`updated.`);
-        resolve();
-      });
+    var connector = this.connector;
+    console.log(`Updating RSS...`);
+    connector.saveRSS(this.toRSS(), () => {
+      console.log(`updated.`);
     });
   },
   toRSS() {
-    const { singleton, slice, entries, entryIds } = this.state;
+    const { singleton, slice, entries, entryIds, index } = this.state;
     if (singleton) return;
     if (slice.start >= 10) return;
     const { base: base2 } = this.props;
@@ -9076,7 +9075,11 @@ var WebLog_default = createClass({
 <lastBuildDate>${(/* @__PURE__ */ new Date()).toUTCString()}</lastBuildDate>
 <pubDate>${(/* @__PURE__ */ new Date()).toUTCString()}</pubDate>
 <ttl>1440</ttl>`;
-    var entriesRSS = entryIds.slice(0, 10).map((id2) => this.entryToRSS(entries[id2])).filter((v) => !!v).join("\n");
+    console.log(`toRSS`, { entryIds, entries, index });
+    var entriesRSS = entryIds.slice(0, 10).map((id2) => {
+      console.log(`toRSS: processing ${id2}`);
+      return this.entryToRSS(entries[id2]);
+    }).filter((v) => !!v).join("\n");
     var rssTail = `</channel></rss>`;
     return rssHeading + entriesRSS + rssTail;
   },
