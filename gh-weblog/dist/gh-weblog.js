@@ -8878,7 +8878,7 @@ var WebLog_default = createClass({
       if (!entry) return null;
       const title2 = utils_default.titleReplace(entry.metaData.title);
       const vanityURL = `../../../pages/${entry.metaData.created}/${title2}`;
-      history.replaceState({}, title2, vanityURL);
+      console.log({ vanityURL });
     }
     return /* @__PURE__ */ react_0_12_min_default.createElement("div", { ref: "weblog", className: "gh-weblog" }, this.state.pending ? /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "pending" }, "pending...") : null, this.generateToC(), this.generateTagList(), /* @__PURE__ */ react_0_12_min_default.createElement(
       Admin_default,
