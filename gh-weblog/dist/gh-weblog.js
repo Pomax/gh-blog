@@ -7348,7 +7348,7 @@ var marked_default = marked;
 var MarkDown_default = react_0_12_min_default.createClass({
   render() {
     let { text } = this.props;
-    text.replace(/^# [^\n]\n/, ``);
+    text = text.replace(/^#\s+[^\n]+\n+/, ``);
     let html = marked_default(text);
     if (!this.props.editable && !this.props.singleton) {
       if (text.length > 1500) {
@@ -7503,9 +7503,7 @@ var Entry_default = createClass({
     this.setState({ tags }, () => this.props.onSave(this));
   },
   getPostData() {
-    return `# ${this.state.title}
-
-${this.state.postData}`;
+    return this.state.postData;
   },
   getMetaData() {
     const md = JSON.parse(JSON.stringify(this.state));

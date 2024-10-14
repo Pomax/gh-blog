@@ -5,8 +5,9 @@ export default React.createClass({
   render() {
     let { text } = this.props;
 
-    // remove the title, it's already rendered as separate heading
-    text.replace(/^# [^\n]\n/, ``);
+    // remove the title, since it's already rendered
+    // as a separate heading above the post.
+    text = text.replace(/^#\s+[^\n]+\n+/, ``);
 
     let html = marked(text);
 
