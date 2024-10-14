@@ -9009,9 +9009,9 @@ var WebLog_default = createClass({
   /* async */
   updateEntry(id2, metaData, postData) {
     const { entries, index } = this.state;
+    entries[id2] = { metaData, postData };
     const { title: title2, created, tags, draft } = metaData;
     index[id2] = { title: title2, created, tags, draft };
-    entries[id2] = { metaData, postData };
     const entryIds = Object.keys(index).sort().reverse();
     return new Promise(
       (resolve) => this.setState({ entryIds, entries, index }, resolve)
@@ -9036,17 +9036,16 @@ var WebLog_default = createClass({
   async deleteEntry(entry) {
     if (confirm("really delete post?")) {
       this.setState({ pending: true });
-      var id2 = entry.state.id;
       const { entryIds, entries, index } = this.state;
+      const id2 = entry.state.id;
       const pos = entryIds.indexOf(id2);
-      entryIds.splice(pos, 1);
-      delete entries[id2];
-      delete index[id2];
-      this.setState({ entryIds, entries, index });
       this.connector.deleteEntry(id2, index, async () => {
         console.log("delete handled");
         await this.saveRSS();
-        this.setState({ pending: false });
+        entryIds.splice(pos, 1);
+        delete entries[id2];
+        delete index[id2];
+        this.setState({ pending: false, entryIds, entries, index });
       });
     }
   },

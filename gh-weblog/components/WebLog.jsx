@@ -297,9 +297,9 @@ export default createClass({
 
   /* async */ updateEntry(id, metaData, postData) {
     const { entries, index } = this.state;
+    entries[id] = { metaData, postData };
     const { title, created, tags, draft } = metaData;
     index[id] = { title, created, tags, draft };
-    entries[id] = { metaData, postData };
     const entryIds = Object.keys(index).sort().reverse();
     return new Promise((resolve) =>
       this.setState({ entryIds, entries, index }, resolve)
@@ -326,17 +326,16 @@ export default createClass({
   async deleteEntry(entry) {
     if (confirm("really delete post?")) {
       this.setState({ pending: true });
-      var id = entry.state.id;
       const { entryIds, entries, index } = this.state;
+      const id = entry.state.id;
       const pos = entryIds.indexOf(id);
-      entryIds.splice(pos, 1);
-      delete entries[id];
-      delete index[id];
-      this.setState({ entryIds, entries, index });
       this.connector.deleteEntry(id, index, async () => {
         console.log("delete handled");
         await this.saveRSS();
-        this.setState({ pending: false });
+        entryIds.splice(pos, 1);
+        delete entries[id];
+        delete index[id];
+        this.setState({ pending: false, entryIds, entries, index });
       });
     }
   },
