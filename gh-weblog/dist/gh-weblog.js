@@ -8705,13 +8705,13 @@ var Connector = class {
     const { octokit, options } = this;
     const { user, repo } = options;
     return new Promise((resolve) => {
-      (/* @__PURE__ */ __name(async function checkDeploy() {
-        const data = await octokit.request(
+      (/* @__PURE__ */ __name(async function checkDeploy(resolve2) {
+        const { status } = await octokit.request(
           `GET /repos/${user}/${repo}/actions/runs`
-        );
-        console.log(`action runs`, data);
-        resolve();
-      }, "checkDeploy"))();
+        ).data.workflow_runs[0];
+        if (status === `completed`) return resolve2();
+        setTimeout(() => checkDeploy(resolve2), 500);
+      }, "checkDeploy"))(resolve);
     });
   }
   // -----------------------------------------------------------
@@ -9045,6 +9045,7 @@ var WebLog_default = createClass({
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
           await connector.waitForDeploy();
+          console.log(`deploy updated`);
         });
       }
     );
@@ -9067,6 +9068,7 @@ var WebLog_default = createClass({
             this.saveRSS();
             this.setState({ pending: false }, async () => {
               await connector.waitForDeploy();
+              console.log(`deploy updated`);
             });
           });
         });

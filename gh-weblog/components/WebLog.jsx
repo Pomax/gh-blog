@@ -325,6 +325,7 @@ export default createClass({
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
           await connector.waitForDeploy();
+          console.log(`deploy updated`);
         });
       }
     );
@@ -352,6 +353,7 @@ export default createClass({
             this.saveRSS();
             this.setState({ pending: false }, async () => {
               await connector.waitForDeploy();
+              console.log(`deploy updated`);
             });
           });
         });
