@@ -113,7 +113,7 @@ export default createClass({
       entry = this.state.entries[id];
       if (!entry) return null;
       const title = utils.titleReplace(entry.metaData.title);
-      const vanityURL = `/pages/${entry.metaData.created}/${title}`;
+      const vanityURL = `../../../pages/${entry.metaData.created}/${title}`;
       history.replaceState({}, title, vanityURL);
     }
 
