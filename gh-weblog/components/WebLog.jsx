@@ -322,7 +322,9 @@ export default createClass({
       async () => {
         console.log("save handled");
         await this.saveRSS();
-        this.setState({ pending: false });
+        this.setState({ pending: false }, async () => {
+          await waitForDeploy();
+        });
       }
     );
   },
@@ -336,7 +338,7 @@ export default createClass({
         entryIds.splice(pos, 1);
         delete entries[id];
         delete index[id];
-        this.setState({ pending: false, entryIds, entries, index }, () => {
+        this.setState({ entryIds, entries, index }, () => {
           const { index } = this.state;
           this.connector.deleteEntry(id, title, created, index, async () => {
             console.log("delete handled");
@@ -346,7 +348,9 @@ export default createClass({
             // it reaches entryToRSS(...) for the last entry.
             await this.loadEntries();
             this.saveRSS();
-            this.setState({ pending: false });
+            this.setState({ pending: false }, async () => {
+              await waitForDeploy();
+            });
           });
         });
       });

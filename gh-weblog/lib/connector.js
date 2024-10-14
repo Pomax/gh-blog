@@ -43,6 +43,20 @@ export default class Connector {
     return this.get(`${this.path}/content/posts/markdown/${id}.md`);
   }
 
+  async waitForDeploy() {
+    const { octokit, options } = this;
+    const { user, repo } = options;
+    return new Promise((resolve) => {
+      (async function checkDeploy() {
+        const data = await octokit.request(
+          `GET /repos/${user}/${repo}/actions/runs`
+        );
+        console.log(`action runs`, data);
+        resolve();
+      })();
+    });
+  }
+
   // -----------------------------------------------------------
 
   async getCurrentSha() {

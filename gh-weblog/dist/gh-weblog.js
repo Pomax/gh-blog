@@ -8701,6 +8701,19 @@ var Connector = class {
   async loadPostData(id2) {
     return this.get(`${this.path}/content/posts/markdown/${id2}.md`);
   }
+  async waitForDeploy() {
+    const { octokit, options } = this;
+    const { user, repo } = options;
+    return new Promise((resolve) => {
+      (/* @__PURE__ */ __name(async function checkDeploy() {
+        const data = await octokit.request(
+          `GET /repos/${user}/${repo}/actions/runs`
+        );
+        console.log(`action runs`, data);
+        resolve();
+      }, "checkDeploy"))();
+    });
+  }
   // -----------------------------------------------------------
   async getCurrentSha() {
     const { octokit, options } = this;
@@ -9029,7 +9042,9 @@ var WebLog_default = createClass({
       async () => {
         console.log("save handled");
         await this.saveRSS();
-        this.setState({ pending: false });
+        this.setState({ pending: false }, async () => {
+          await waitForDeploy();
+        });
       }
     );
   },
@@ -9042,13 +9057,15 @@ var WebLog_default = createClass({
         entryIds.splice(pos, 1);
         delete entries[id2];
         delete index[id2];
-        this.setState({ pending: false, entryIds, entries, index }, () => {
+        this.setState({ entryIds, entries, index }, () => {
           const { index: index2 } = this.state;
           this.connector.deleteEntry(id2, title2, created, index2, async () => {
             console.log("delete handled");
             await this.loadEntries();
             this.saveRSS();
-            this.setState({ pending: false });
+            this.setState({ pending: false }, async () => {
+              await waitForDeploy();
+            });
           });
         });
       });
