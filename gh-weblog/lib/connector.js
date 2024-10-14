@@ -86,7 +86,7 @@ export default class Connector {
       {
         message: `Saving static redirect page`,
         path: `pages/${created}/${utils.titleReplace(title)}/index.html`,
-        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${created}">`,
+        content: `<meta http-equiv="refresh" content="0; url=../../../index.html?postid=${created}">`,
       },
     ];
     await this.processCommit(files);

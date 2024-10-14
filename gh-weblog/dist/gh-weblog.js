@@ -8739,7 +8739,7 @@ var Connector = class {
       {
         message: `Saving static redirect page`,
         path: `pages/${created}/${utils_default.titleReplace(title2)}/index.html`,
-        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${created}">`
+        content: `<meta http-equiv="refresh" content="0; url=../../../index.html?postid=${created}">`
       }
     ];
     await this.processCommit(files);
@@ -8853,7 +8853,6 @@ var WebLog_default = createClass({
   },
   render() {
     const { state } = this;
-    console.log(state);
     if (!!state.singleton) {
       return this.renderContent();
     }
@@ -8994,8 +8993,7 @@ var WebLog_default = createClass({
     });
   },
   createEntry() {
-    const date = /* @__PURE__ */ new Date();
-    const timestamp = date.getTime();
+    const timestamp = Date.now();
     const metaData = {
       title: "New Entry",
       created: timestamp,
@@ -9010,11 +9008,12 @@ var WebLog_default = createClass({
   },
   /* async */
   updateEntry(id2, metaData, postData) {
+    console.log({ id: id2, metaData, postData });
     const { entries, index } = this.state;
-    entries[id2] = { metaData, postData };
-    const entryIds = Object.keys(index).sort().reverse();
     const { title: title2, created, tags, draft } = metaData;
     index[id2] = { title: title2, created, tags, draft };
+    entries[id2] = { metaData, postData };
+    const entryIds = Object.keys(index).sort().reverse();
     return new Promise(
       (resolve) => this.setState({ entryIds, entries, index }, resolve)
     );

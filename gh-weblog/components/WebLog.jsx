@@ -75,7 +75,6 @@ export default createClass({
 
   render() {
     const { state } = this;
-    console.log(state);
 
     if (!!state.singleton) {
       return this.renderContent();
@@ -283,8 +282,7 @@ export default createClass({
   },
 
   createEntry() {
-    const date = new Date();
-    const timestamp = date.getTime();
+    const timestamp = Date.now();
     const metaData = {
       title: "New Entry",
       created: timestamp,
@@ -299,11 +297,12 @@ export default createClass({
   },
 
   /* async */ updateEntry(id, metaData, postData) {
+    console.log({ id, metaData, postData });
     const { entries, index } = this.state;
-    entries[id] = { metaData, postData };
-    const entryIds = Object.keys(index).sort().reverse();
     const { title, created, tags, draft } = metaData;
     index[id] = { title, created, tags, draft };
+    entries[id] = { metaData, postData };
+    const entryIds = Object.keys(index).sort().reverse();
     return new Promise((resolve) =>
       this.setState({ entryIds, entries, index }, resolve)
     );
