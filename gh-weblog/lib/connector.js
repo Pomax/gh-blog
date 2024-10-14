@@ -48,9 +48,9 @@ export default class Connector {
     const { user, repo } = options;
     return new Promise((resolve) => {
       (async function checkDeploy(resolve) {
-        const { status } = await octokit.request(
+        const { status } = (await octokit.request(
           `GET /repos/${user}/${repo}/actions/runs`
-        ).data.workflow_runs[0];
+        )).data.workflow_runs[0];
         if (status === `completed`) return resolve();
         setTimeout(() => checkDeploy(resolve), 500);
       })(resolve);
