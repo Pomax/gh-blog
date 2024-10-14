@@ -261,6 +261,7 @@ export default createClass({
 
   loadEntries(id) {
     const { updateEntry, connector, state } = this;
+    const { entries } = state;
 
     // find load slice
     const start = state.slice.start;
@@ -272,7 +273,7 @@ export default createClass({
       (async function next(list) {
         if (!list.length) return resolve();
         const id = list.shift();
-        if (!this.state.entries[id]) {
+        if (!entries[id]) {
           const metaData = await connector.loadMetaData(id);
           const postData = await connector.loadPostData(id);
           await updateEntry(id, metaData, postData);

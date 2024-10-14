@@ -8976,6 +8976,7 @@ var WebLog_default = createClass({
   // ------------------------------------------------------------
   loadEntries(id2) {
     const { updateEntry, connector, state } = this;
+    const { entries } = state;
     const start = state.slice.start;
     const end = state.slice.end;
     const slice = id2 ? [id2] : state.entryIds.slice(start, end);
@@ -8983,7 +8984,7 @@ var WebLog_default = createClass({
       (/* @__PURE__ */ __name(async function next(list) {
         if (!list.length) return resolve();
         const id3 = list.shift();
-        if (!this.state.entries[id3]) {
+        if (!entries[id3]) {
           const metaData = await connector.loadMetaData(id3);
           const postData = await connector.loadPostData(id3);
           await updateEntry(id3, metaData, postData);
