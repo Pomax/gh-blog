@@ -272,7 +272,7 @@ export default createClass({
       (async function next(list) {
         if (!list.length) return resolve();
         const id = list.shift();
-        if (!entries[id]) {
+        if (!this.state.entries[id]) {
           const metaData = await connector.loadMetaData(id);
           const postData = await connector.loadPostData(id);
           await updateEntry(id, metaData, postData);
