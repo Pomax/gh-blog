@@ -8868,17 +8868,17 @@ var WebLog_default = createClass({
     if (!!state.singleton) {
       return this.renderContent();
     }
-    var postButton = state.authenticated ? /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin post button", onClick: this.createEntry }, "new entry") : false;
-    var adminButton = /* @__PURE__ */ react_0_12_min_default.createElement(
+    const postButton = state.authenticated ? /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "admin post button", onClick: this.createEntry }, "new entry") : false;
+    const adminButton = /* @__PURE__ */ react_0_12_min_default.createElement(
       "button",
       {
-        className: "authenticate",
+        className: `authenticate ${state.deploying ? `deploying` : ``}`,
         onClick: this.showSettings,
         onClose: this.bindSettings
       },
       "admin"
     );
-    var moreButton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "more-posts", onClick: this.more }, "Load more posts");
+    const moreButton = /* @__PURE__ */ react_0_12_min_default.createElement("button", { className: "more-posts", onClick: this.more }, "Load more posts");
     return this.renderContent(adminButton, postButton, moreButton);
   },
   renderContent(adminButton, postButton, moreButton) {
@@ -9032,7 +9032,7 @@ var WebLog_default = createClass({
   },
   async saveEntry(entry) {
     const { connector } = this;
-    this.setState({ pending: true });
+    this.setState({ pending: true, deploying: true });
     const metaData = entry.getMetaData();
     const id2 = metaData.id;
     const postData = entry.getPostData();
@@ -9045,7 +9045,7 @@ var WebLog_default = createClass({
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
           await connector.waitForDeploy();
-          console.log(`deploy updated`);
+          this.setState({ deploying: false });
         });
       }
     );
@@ -9053,7 +9053,7 @@ var WebLog_default = createClass({
   async deleteEntry(entry) {
     const { connector } = this;
     if (confirm("really delete post?")) {
-      this.setState({ pending: true }, () => {
+      this.setState({ pending: true, deploying: true }, () => {
         const { entryIds, entries, index } = this.state;
         const { id: id2, created, title: title2 } = entry.state;
         const pos = entryIds.indexOf(id2);
@@ -9068,7 +9068,7 @@ var WebLog_default = createClass({
             this.saveRSS();
             this.setState({ pending: false }, async () => {
               await connector.waitForDeploy();
-              console.log(`deploy updated`);
+              this.setState({ deploying: false });
             });
           });
         });

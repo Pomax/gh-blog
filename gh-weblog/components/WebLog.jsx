@@ -80,23 +80,25 @@ export default createClass({
       return this.renderContent();
     }
 
-    var postButton = state.authenticated ? (
+    const postButton = state.authenticated ? (
       <button className="admin post button" onClick={this.createEntry}>
         new entry
       </button>
     ) : (
       false
     );
-    var adminButton = (
+
+    const adminButton = (
       <button
-        className="authenticate"
+        className={`authenticate ${state.deploying ? `deploying` : ``}`}
         onClick={this.showSettings}
         onClose={this.bindSettings}
       >
         admin
       </button>
     );
-    var moreButton = (
+
+    const moreButton = (
       <button className="more-posts" onClick={this.more}>
         Load more posts
       </button>
@@ -312,7 +314,7 @@ export default createClass({
 
   async saveEntry(entry) {
     const { connector } = this;
-    this.setState({ pending: true });
+    this.setState({ pending: true, deploying: true });
     const metaData = entry.getMetaData();
     const id = metaData.id;
     const postData = entry.getPostData();
@@ -325,7 +327,7 @@ export default createClass({
         await this.saveRSS();
         this.setState({ pending: false }, async () => {
           await connector.waitForDeploy();
-          console.log(`deploy updated`);
+          this.setState({ deploying: false });
         });
       }
     );
@@ -334,7 +336,7 @@ export default createClass({
   async deleteEntry(entry) {
     const { connector } = this;
     if (confirm("really delete post?")) {
-      this.setState({ pending: true }, () => {
+      this.setState({ pending: true, deploying: true }, () => {
         const { entryIds, entries, index } = this.state;
         const { id, created, title } = entry.state;
         const pos = entryIds.indexOf(id);
@@ -353,7 +355,7 @@ export default createClass({
             this.saveRSS();
             this.setState({ pending: false }, async () => {
               await connector.waitForDeploy();
-              console.log(`deploy updated`);
+              this.setState({ deploying: false });
             });
           });
         });
