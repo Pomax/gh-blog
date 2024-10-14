@@ -9040,10 +9040,11 @@ var WebLog_default = createClass({
       entryIds.splice(pos, 1);
       delete entries[id2];
       delete index[id2];
-      this.connector.deleteEntry(id2, title2, created, index, async () => {
-        console.log("delete handled");
-        await this.saveRSS();
-        this.setState({ pending: false, entryIds, entries, index });
+      this.setState({ pending: false, entryIds, entries, index }, () => {
+        this.connector.deleteEntry(id2, title2, created, index, async () => {
+          console.log("delete handled");
+          await this.saveRSS();
+        });
       });
     }
   },

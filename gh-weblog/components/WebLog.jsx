@@ -332,10 +332,11 @@ export default createClass({
       entryIds.splice(pos, 1);
       delete entries[id];
       delete index[id];
-      this.connector.deleteEntry(id, title, created, index, async () => {
-        console.log("delete handled");
-        await this.saveRSS();
-        this.setState({ pending: false, entryIds, entries, index });
+      this.setState({ pending: false, entryIds, entries, index }, () => {
+        this.connector.deleteEntry(id, title, created, index, async () => {
+          console.log("delete handled");
+          await this.saveRSS();
+        });
       });
     }
   },
