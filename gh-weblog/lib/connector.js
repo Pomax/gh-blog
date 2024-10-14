@@ -52,7 +52,7 @@ export default class Connector {
           `GET /repos/${user}/${repo}/actions/runs`
         )).data.workflow_runs[0];
         if (status === `completed`) return resolve();
-        setTimeout(() => checkDeploy(resolve), 500);
+        setTimeout(() => checkDeploy(resolve), 10000);
       })(resolve);
     });
   }

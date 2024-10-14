@@ -8710,7 +8710,7 @@ var Connector = class {
           `GET /repos/${user}/${repo}/actions/runs`
         )).data.workflow_runs[0];
         if (status === `completed`) return resolve2();
-        setTimeout(() => checkDeploy(resolve2), 500);
+        setTimeout(() => checkDeploy(resolve2), 1e4);
       }, "checkDeploy"))(resolve);
     });
   }
