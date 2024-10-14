@@ -267,8 +267,8 @@ export default createClass({
     const end = state.slice.end;
     const slice = id ? [id] : state.entryIds.slice(start, end);
 
+    // Load all entries in the list, and resolve (for any await calls) once done.
     return new Promise((resolve) => {
-      // run through all
       (async function next(list) {
         if (!list.length) return resolve();
         const id = list.shift();
@@ -339,6 +339,10 @@ export default createClass({
         const { index } = this.state;
         this.connector.deleteEntry(id, title, created, index, async () => {
           console.log("delete handled");
+          // We need to run loadEntries to make sure we actually have
+          // all the data available to regenerate the RSS. If we don't,
+          // we'll be one entry short, and toRSS will error out when
+          // it reaches entryToRSS(...) for the last entry.
           await this.loadEntries();
           this.saveRSS();
           this.setState({ pending: false });
