@@ -17,7 +17,7 @@ for (const filename of dir) {
     //and generate the redirect .html file
     const indexPath = `../../../pages/${created}/${utils.titleReplace(title)}`;
     await fs.mkdir(indexPath, { recursive: true });
-    const html = `<title>${title}</title><meta http-equiv="refresh" content="0; url=/index.html?postid=${created}">`;
+    const html = `<title>${title}</title><meta http-equiv="refresh" content="0; url=../../../index.html?postid=${created}">`;
     await fs.writeFile(`${indexPath}/index.html`, html);
   } catch (e) {
     console.log(`ERROR:`, e);

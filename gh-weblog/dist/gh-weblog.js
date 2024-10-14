@@ -7455,6 +7455,7 @@ var Entry_default = createClass({
   },
   render() {
     const { props, state } = this;
+    const { singleton, editable } = props;
     const title2 = utils_default.titleReplace(state.title);
     let deleteButton;
     if (props.editable) {
@@ -7462,15 +7463,21 @@ var Entry_default = createClass({
     }
     const posted = new Date(state.published).toLocaleString();
     const updated = new Date(state.updated).toLocaleString();
-    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement("a", { href: `pages/${state.created}/${title2}` }, state.title)), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
+    return /* @__PURE__ */ react_0_12_min_default.createElement("div", { className: "entry", id: `gh-weblog-${state.created}` }, deleteButton, /* @__PURE__ */ react_0_12_min_default.createElement("header", null, /* @__PURE__ */ react_0_12_min_default.createElement("h1", null, /* @__PURE__ */ react_0_12_min_default.createElement(
+      "a",
+      {
+        href: `${singleton ? `../../../` : ``}pages/${state.created}/${title2}`
+      },
+      state.title
+    )), /* @__PURE__ */ react_0_12_min_default.createElement("h2", null, "Originally posted on ", posted, ", last updated on ", updated)), /* @__PURE__ */ react_0_12_min_default.createElement(
       MarkDown_default,
       {
         ref: "markdown",
         hidden: state.editing,
         text: state.postData,
         onClick: this.edit,
-        singleton: this.props.singleton,
-        editable: this.props.editable
+        singleton,
+        editable
       }
     ), /* @__PURE__ */ react_0_12_min_default.createElement(
       Editor_default,
@@ -8866,6 +8873,7 @@ var WebLog_default = createClass({
     let entry = false;
     const id2 = this.state.singleton;
     if (id2) {
+      console.log(`loading a single post`);
       entry = this.state.entries[id2];
       if (!entry) return null;
       const title2 = utils_default.titleReplace(entry.metaData.title);

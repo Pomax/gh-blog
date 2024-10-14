@@ -29,6 +29,7 @@ export default createClass({
 
   render() {
     const { props, state } = this;
+    const { singleton, editable } = props;
     const title = utils.titleReplace(state.title);
     let deleteButton;
     if (props.editable) {
@@ -46,7 +47,11 @@ export default createClass({
         {deleteButton}
         <header>
           <h1>
-            <a href={`pages/${state.created}/${title}`}>{state.title}</a>
+            <a
+              href={`${singleton ? `../../../` : ``}pages/${state.created}/${title}`}
+            >
+              {state.title}
+            </a>
           </h1>
           <h2>
             Originally posted on {posted}, last updated on {updated}
@@ -57,8 +62,8 @@ export default createClass({
           hidden={state.editing}
           text={state.postData}
           onClick={this.edit}
-          singleton={this.props.singleton}
-          editable={this.props.editable}
+          singleton={singleton}
+          editable={editable}
         />
         <Editor
           ref="editor"

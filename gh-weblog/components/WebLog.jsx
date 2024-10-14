@@ -109,6 +109,7 @@ export default createClass({
     let entry = false;
     const id = this.state.singleton;
     if (id) {
+      console.log(`loading a single post`);
       entry = this.state.entries[id];
       if (!entry) return null;
       const title = utils.titleReplace(entry.metaData.title);
