@@ -3,7 +3,11 @@ import marked from "../lib/vendor/marked/marked.js";
 
 export default React.createClass({
   render() {
-    const { text } = this.props;
+    let { text } = this.props;
+
+    // remove the title, it's already rendered as separate heading
+    text.replace(/^# [^\n]\n/, ``);
+
     let html = marked(text);
 
     // If this is a "visitor view", show an excerpt + "show entire post"
