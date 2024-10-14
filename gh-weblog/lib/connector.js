@@ -65,7 +65,7 @@ export default class Connector {
   }
 
   async saveEntry({ id, metaData, postData }, index, saved) {
-    const { title, published } = metaData;
+    const { title, created } = metaData;
     const path = `${this.path}/content/posts/`;
     const files = [
       {
@@ -85,8 +85,8 @@ export default class Connector {
       },
       {
         message: `Saving static redirect page`,
-        path: `pages/${published}/${utils.titleReplace(title)}/index.html`,
-        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${published}">`,
+        path: `pages/${created}/${utils.titleReplace(title)}/index.html`,
+        content: `<meta http-equiv="refresh" content="0; url=${location.toString()}?postid=${created}">`,
       },
     ];
     await this.processCommit(files);
@@ -94,7 +94,7 @@ export default class Connector {
   }
 
   async deleteEntry(id, index, deleted) {
-    const { title, published } = index[id];
+    const { title, created } = index[id];
     const path = `${this.path}/content/posts/`;
     const files = [
       {
@@ -112,7 +112,7 @@ export default class Connector {
       },
       {
         message: `Deleting static redirect page`,
-        path: `pages/${published}/${utils.titleReplace(title)}/index.html`,
+        path: `pages/${created}/${utils.titleReplace(title)}/index.html`,
       },
     ];
     await this.processCommit(files);

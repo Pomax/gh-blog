@@ -42,11 +42,11 @@ export default createClass({
     const updated = new Date(state.updated).toLocaleString();
 
     return (
-      <div className="entry" id={`gh-weblog-${state.published}`}>
+      <div className="entry" id={`gh-weblog-${state.created}`}>
         {deleteButton}
         <header>
           <h1>
-            <a href={`pages/${state.published}/${title}`}>{state.title}</a>
+            <a href={`pages/${state.created}/${title}`}>{state.title}</a>
           </h1>
           <h2>
             Originally posted on {posted}, last updated on {updated}
@@ -100,8 +100,6 @@ export default createClass({
   },
 
   edit(evt) {
-    console.log(evt.target);
-    return;
     if (this.props.editable) {
       this.refs.editor.setText(this.getPostData());
       this.setState({ editing: true });

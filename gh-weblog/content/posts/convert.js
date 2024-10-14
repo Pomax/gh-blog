@@ -11,17 +11,13 @@ for (const filename of dir) {
   try {
     // build up the index
     const data = JSON.parse(content);
+    const { title, created, tags } = data;
     const id = filename.replace(`.json`, ``);
-    index[id] = {
-      title: data.title,
-      published: data.published,
-      tags: data.tags,
-    };
-
+    index[id] = { title, created, tags };
     //and generate the redirect .html file
-    const indexPath = `../../../pages/${data.published}/${utils.titleReplace(data.title)}`;
+    const indexPath = `../../../pages/${created}/${utils.titleReplace(title)}`;
     await fs.mkdir(indexPath, { recursive: true });
-    const html = `<title>${data.title}</title><meta http-equiv="refresh" content="0; url=/index.html?postid=${data.published}">`;
+    const html = `<title>${title}</title><meta http-equiv="refresh" content="0; url=/index.html?postid=${created}">`;
     await fs.writeFile(`${indexPath}/index.html`, html);
   } catch (e) {
     console.log(`ERROR:`, e);

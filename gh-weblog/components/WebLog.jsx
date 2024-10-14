@@ -112,7 +112,7 @@ export default createClass({
       entry = this.state.entries[id];
       if (!entry) return null;
       const title = utils.titleReplace(entry.metaData.title);
-      const vanityURL = `/pages/${entry.metaData.published}/${title}`;
+      const vanityURL = `/pages/${entry.metaData.created}/${title}`;
       history.replaceState({}, title, vanityURL);
     }
 
@@ -142,8 +142,8 @@ export default createClass({
         <table>
           {Object.values(this.state.index)
             .reverse()
-            .map(({ title, published, tags }) => {
-              const date = new Date(published);
+            .map(({ title, created, tags }) => {
+              const date = new Date(created);
               let when = date.toLocaleDateString("en-GB", {
                 month: "long",
                 day: "numeric",
@@ -155,7 +155,7 @@ export default createClass({
                   <td className="when">{when}</td>
                   <td>
                     <a
-                      href={`${singleton ? `../../` : ``}pages/${published}/${utils.titleReplace(title)}`}
+                      href={`${singleton ? `../../` : ``}pages/${created}/${utils.titleReplace(title)}`}
                     >
                       {title}
                     </a>
@@ -300,8 +300,8 @@ export default createClass({
     const { entries, index } = this.state;
     entries[id] = { metaData, postData };
     const entryIds = Object.keys(index).sort().reverse();
-    const { title, published, tags, draft } = metaData;
-    index[id] = { title, published, tags, draft };
+    const { title, created, tags, draft } = metaData;
+    index[id] = { title, created, tags, draft };
     return new Promise((resolve) =>
       this.setState({ entryIds, entries, index }, resolve)
     );
@@ -398,15 +398,15 @@ export default createClass({
 
   entryToRSS(entry) {
     const { metaData, postData } = entry;
-    const { published } = metaData;
+    const { created, published, title, tags } = metaData;
     const html = marked(postData);
     const { base } = WebLogSettings.getSettings();
     return `<item>
-<title>${metaData.title}</title>
+<title>${title}</title>
 <description><![CDATA[${html}]]></description>
-${metaData.tags.map((tag) => `<category>${tag}</category>`).join(`\n`)}
-<link>${base}?postid=${published}</link>
-<guid>${base}?postid=${published}</guid>
+${tags.map((tag) => `<category>${tag}</category>`).join(`\n`)}
+<link>${base}?postid=${created}</link>
+<guid>${base}?postid=${created}</guid>
 <pubDate>${new Date(published).toUTCString()}</pubDate>
 </item>`;
   },
