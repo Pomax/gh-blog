@@ -109,7 +109,6 @@ export default createClass({
     let entry = false;
     const id = this.state.singleton;
     if (id) {
-      console.log(`loading a single post`);
       entry = this.state.entries[id];
       if (!entry) return null;
       const title = utils.titleReplace(entry.metaData.title);
@@ -297,7 +296,6 @@ export default createClass({
   },
 
   /* async */ updateEntry(id, metaData, postData) {
-    console.log({ id, metaData, postData });
     const { entries, index } = this.state;
     const { title, created, tags, draft } = metaData;
     index[id] = { title, created, tags, draft };

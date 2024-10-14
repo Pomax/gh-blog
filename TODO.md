@@ -1,1 +1,1 @@
-ids are currently based on "published", which is currently the same as "created" because there's no "draft" flag. Does that matter?
+- Add image drag-and-drop upload, moving them into a "images/postid" folder.

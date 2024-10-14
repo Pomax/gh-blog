@@ -8873,7 +8873,6 @@ var WebLog_default = createClass({
     let entry = false;
     const id2 = this.state.singleton;
     if (id2) {
-      console.log(`loading a single post`);
       entry = this.state.entries[id2];
       if (!entry) return null;
       const title2 = utils_default.titleReplace(entry.metaData.title);
@@ -9008,7 +9007,6 @@ var WebLog_default = createClass({
   },
   /* async */
   updateEntry(id2, metaData, postData) {
-    console.log({ id: id2, metaData, postData });
     const { entries, index } = this.state;
     const { title: title2, created, tags, draft } = metaData;
     index[id2] = { title: title2, created, tags, draft };
