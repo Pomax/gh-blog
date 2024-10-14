@@ -113,7 +113,7 @@ export default createClass({
 
   update(evt) {
     const lines = evt.target.value.split("\n");
-    const title = lines.splice(0, 1)[0].replace(/^# */, "");
+    const title = lines.splice(0, 1)[0].replace(/^# */, "").trim();
     const postData = lines.join("\n").trim();
     this.setState({ title, postData, updated: Date.now() });
   },

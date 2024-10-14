@@ -1,1 +1,2 @@
 - Add image drag-and-drop upload, moving them into a "images/postid" folder.
+- Monitor gh actions to see when it's safe to reload?

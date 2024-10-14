@@ -7523,7 +7523,7 @@ ${this.state.postData}`;
   },
   update(evt) {
     const lines = evt.target.value.split("\n");
-    const title2 = lines.splice(0, 1)[0].replace(/^# */, "");
+    const title2 = lines.splice(0, 1)[0].replace(/^# */, "").trim();
     const postData = lines.join("\n").trim();
     this.setState({ title: title2, postData, updated: Date.now() });
   },
@@ -8745,9 +8745,7 @@ var Connector = class {
     await this.processCommit(files);
     saved?.();
   }
-  async deleteEntry(id2, index, deleted) {
-    console.log({ id: id2, index });
-    const { title: title2, created } = index[id2];
+  async deleteEntry(id2, title2, created, index, deleted) {
     const path2 = `${this.path}/content/posts/`;
     const files = [
       {
@@ -9037,14 +9035,14 @@ var WebLog_default = createClass({
     if (confirm("really delete post?")) {
       this.setState({ pending: true });
       const { entryIds, entries, index } = this.state;
-      const id2 = entry.state.id;
+      const { id: id2, created, title: title2 } = entry.state;
       const pos = entryIds.indexOf(id2);
-      this.connector.deleteEntry(id2, index, async () => {
+      entryIds.splice(pos, 1);
+      delete entries[id2];
+      delete index[id2];
+      this.connector.deleteEntry(id2, title2, created, index, async () => {
         console.log("delete handled");
         await this.saveRSS();
-        entryIds.splice(pos, 1);
-        delete entries[id2];
-        delete index[id2];
         this.setState({ pending: false, entryIds, entries, index });
       });
     }

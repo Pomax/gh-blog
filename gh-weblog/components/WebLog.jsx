@@ -327,14 +327,14 @@ export default createClass({
     if (confirm("really delete post?")) {
       this.setState({ pending: true });
       const { entryIds, entries, index } = this.state;
-      const id = entry.state.id;
+      const { id, created, title } = entry.state;
       const pos = entryIds.indexOf(id);
-      this.connector.deleteEntry(id, index, async () => {
+      entryIds.splice(pos, 1);
+      delete entries[id];
+      delete index[id];
+      this.connector.deleteEntry(id, title, created, index, async () => {
         console.log("delete handled");
         await this.saveRSS();
-        entryIds.splice(pos, 1);
-        delete entries[id];
-        delete index[id];
         this.setState({ pending: false, entryIds, entries, index });
       });
     }
