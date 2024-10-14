@@ -8853,6 +8853,7 @@ var WebLog_default = createClass({
   },
   render() {
     const { state } = this;
+    console.log(state);
     if (!!state.singleton) {
       return this.renderContent();
     }
