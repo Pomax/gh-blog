@@ -8746,6 +8746,7 @@ var Connector = class {
     saved?.();
   }
   async deleteEntry(id2, index, deleted) {
+    console.log({ id: id2, index });
     const { title: title2, created } = index[id2];
     const path2 = `${this.path}/content/posts/`;
     const files = [

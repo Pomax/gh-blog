@@ -94,6 +94,7 @@ export default class Connector {
   }
 
   async deleteEntry(id, index, deleted) {
+    console.log({ id, index });
     const { title, created } = index[id];
     const path = `${this.path}/content/posts/`;
     const files = [
