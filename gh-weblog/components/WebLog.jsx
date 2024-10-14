@@ -328,24 +328,25 @@ export default createClass({
 
   async deleteEntry(entry) {
     if (confirm("really delete post?")) {
-      this.setState({ pending: true });
-      const { entryIds, entries, index } = this.state;
-      const { id, created, title } = entry.state;
-      const pos = entryIds.indexOf(id);
-      entryIds.splice(pos, 1);
-      delete entries[id];
-      delete index[id];
-      this.setState({ pending: false, entryIds, entries, index }, () => {
-        const { index } = this.state;
-        this.connector.deleteEntry(id, title, created, index, async () => {
-          console.log("delete handled");
-          // We need to run loadEntries to make sure we actually have
-          // all the data available to regenerate the RSS. If we don't,
-          // we'll be one entry short, and toRSS will error out when
-          // it reaches entryToRSS(...) for the last entry.
-          await this.loadEntries();
-          this.saveRSS();
-          this.setState({ pending: false });
+      this.setState({ pending: true }, () => {
+        const { entryIds, entries, index } = this.state;
+        const { id, created, title } = entry.state;
+        const pos = entryIds.indexOf(id);
+        entryIds.splice(pos, 1);
+        delete entries[id];
+        delete index[id];
+        this.setState({ pending: false, entryIds, entries, index }, () => {
+          const { index } = this.state;
+          this.connector.deleteEntry(id, title, created, index, async () => {
+            console.log("delete handled");
+            // We need to run loadEntries to make sure we actually have
+            // all the data available to regenerate the RSS. If we don't,
+            // we'll be one entry short, and toRSS will error out when
+            // it reaches entryToRSS(...) for the last entry.
+            await this.loadEntries();
+            this.saveRSS();
+            this.setState({ pending: false });
+          });
         });
       });
     }

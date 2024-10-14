@@ -9034,20 +9034,21 @@ var WebLog_default = createClass({
   },
   async deleteEntry(entry) {
     if (confirm("really delete post?")) {
-      this.setState({ pending: true });
-      const { entryIds, entries: entries2, index } = this.state;
-      const { id: id2, created, title: title2 } = entry.state;
-      const pos = entryIds.indexOf(id2);
-      entryIds.splice(pos, 1);
-      delete entries2[id2];
-      delete index[id2];
-      this.setState({ pending: false, entryIds, entries: entries2, index }, () => {
-        const { index: index2 } = this.state;
-        this.connector.deleteEntry(id2, title2, created, index2, async () => {
-          console.log("delete handled");
-          await this.loadEntries();
-          this.saveRSS();
-          this.setState({ pending: false });
+      this.setState({ pending: true }, () => {
+        const { entryIds, entries: entries2, index } = this.state;
+        const { id: id2, created, title: title2 } = entry.state;
+        const pos = entryIds.indexOf(id2);
+        entryIds.splice(pos, 1);
+        delete entries2[id2];
+        delete index[id2];
+        this.setState({ pending: false, entryIds, entries: entries2, index }, () => {
+          const { index: index2 } = this.state;
+          this.connector.deleteEntry(id2, title2, created, index2, async () => {
+            console.log("delete handled");
+            await this.loadEntries();
+            this.saveRSS();
+            this.setState({ pending: false });
+          });
         });
       });
     }
