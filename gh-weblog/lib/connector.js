@@ -48,10 +48,12 @@ export default class Connector {
     const { user, repo } = options;
     return new Promise((resolve) => {
       (async function checkDeploy(resolve) {
-        const { status } = (await octokit.request(
-          `GET /repos/${user}/${repo}/actions/runs`
-        )).data.workflow_runs[0];
+        const { status } = (
+          await octokit.request(`GET /repos/${user}/${repo}/actions/runs`)
+        ).data.workflow_runs[0];
         if (status === `completed`) return resolve();
+        // we recheck every 10 seconds, because deploys take long
+        // enough that checking more frequently is just pointless.
         setTimeout(() => checkDeploy(resolve), 10000);
       })(resolve);
     });
